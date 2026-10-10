@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>漢字テスト・ふくしゅうプリント</title>
+<meta name="description" content="小学1〜6年の全1026字。漢字テスト・練習プリント・かくにん表・漢字帳のお手本を、A4縦書きのPDFでつくれる無料アプリ。">
+<meta name="app-version" content="1.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface-2:#f6f8fa; --ink:#1b2530; --sub:#5a6876; --faint:#8a96a3;
+  --line:#dce2e8; --ai:#27497a; --ai-ink:#ffffff; --ai-soft:#e4ecf6; --dash:#c9d3dd; --shu:#c0392b;
+  --t1:#d3eed8; --t1d:#2d7a4c; --t2:#fbe0c2; --t2d:#a0530d; --t3:#d7e2f6; --t3d:#2b4d8c;
+  --r-lg:14px; --r-md:10px; --r-sm:7px;
+  --shadow:0 1px 0 rgba(20,40,70,.04), 0 6px 20px -12px rgba(20,40,70,.25);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161b; --surface:#1b2128; --surface-2:#222a32; --ink:#e6ebf0; --sub:#a6b2be; --faint:#7d8a97;
+    --line:#2e3742; --ai:#8fb4e6; --ai-ink:#0f1a29; --ai-soft:#22314a; --dash:#3a4654; --shu:#ec7d70;
+    --t1:#1f3f2a; --t1d:#86d6a2; --t2:#46311d; --t2d:#f2b577; --t3:#20314c; --t3d:#9cbcf0;
+    --shadow:0 1px 0 rgba(0,0,0,.2), 0 8px 24px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161b; --surface:#1b2128; --surface-2:#222a32; --ink:#e6ebf0; --sub:#a6b2be; --faint:#7d8a97;
+  --line:#2e3742; --ai:#8fb4e6; --ai-ink:#0f1a29; --ai-soft:#22314a; --dash:#3a4654; --shu:#ec7d70;
+  --t1:#1f3f2a; --t1d:#86d6a2; --t2:#46311d; --t2d:#f2b577; --t3:#20314c; --t3d:#9cbcf0;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid #e2a83b;outline-offset:2px}
+.kan{font-family:"Klee One","Hiragino Mincho ProN",serif;font-weight:600}
+
+/* ---- header ---- */
+.top{max-width:1240px;margin:0 auto;padding:22px 20px 6px;display:flex;align-items:center;gap:14px}
+.mark{position:relative;width:46px;height:46px;flex:none;border:2px solid var(--ai);border-radius:4px;display:grid;place-items:center;background:var(--surface);color:var(--ai);font-size:30px;line-height:1}
+.mark::before,.mark::after{content:"";position:absolute;pointer-events:none}
+.mark::before{left:50%;top:4px;bottom:4px;border-left:1px dashed var(--dash)}
+.mark::after{top:50%;left:4px;right:4px;border-top:1px dashed var(--dash)}
+.mark span{position:relative}
+.top h1{margin:0;font-size:clamp(20px,3vw,26px);line-height:1.25;letter-spacing:.04em}
+.top p{margin:2px 0 0;color:var(--sub);font-size:13px}
+
+/* ---- layout ---- */
+.app{max-width:1240px;margin:0 auto;padding:12px 20px 120px;display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:900px){.app{grid-template-columns:1fr;padding-bottom:140px}}
+.panel{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 16px 18px;box-shadow:var(--shadow)}
+.card h2{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:15px}
+.card h2 .n{width:24px;height:24px;border-radius:50%;background:var(--ai);color:var(--ai-ink);display:grid;place-items:center;font-size:13px;flex:none}
+.card h2 .aside{margin-left:auto;font-size:12px;font-weight:400;color:var(--sub)}
+
+/* 学年：マス目 */
+.grades{display:grid;grid-template-columns:repeat(6,1fr);border:2px solid var(--ai);border-radius:4px;overflow:hidden}
+.grades button{position:relative;aspect-ratio:1;border:0;border-right:1px solid var(--dash);background:var(--surface);cursor:pointer;padding:0;font-size:clamp(26px,5.4vw,40px);line-height:1;transition:background .15s}
+.grades button:last-child{border-right:0}
+.grades button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;aspect-ratio:auto;padding:12px 0 10px;font-family:"BIZ UDPGothic","Hiragino Sans",sans-serif}
+.grades button .gy{display:flex;align-items:baseline;gap:1px;line-height:1}
+.grades button .gn{font-size:clamp(24px,4.4vw,30px);font-weight:700;font-variant-numeric:tabular-nums}
+.grades button .gl{font-size:clamp(12px,2.4vw,14px);font-weight:700}
+.grades button small{font-size:11px;font-weight:400;color:var(--faint)}
+.grades button:hover{background:var(--surface-2)}
+.grades button[aria-checked="true"]{background:var(--ai);color:var(--ai-ink)}
+.grades button[aria-checked="true"] small{color:var(--ai-ink);opacity:.8}
+
+/* 学期 */
+.terms{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+@media (max-width:420px){.terms{grid-template-columns:repeat(2,1fr)}}
+.terms.two{grid-template-columns:repeat(3,1fr)}
+.term{position:relative;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:9px 10px 8px;cursor:pointer;line-height:1.3;min-height:66px}
+.term b{display:block;font-size:15px}
+.term .mo{display:block;font-size:11px;color:var(--faint)}
+.term .st{display:inline-block;margin-top:5px;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--surface-2);color:var(--sub)}
+.term .st.ok{background:var(--ai-soft);color:var(--ai)}
+.term[aria-checked="true"]{border-color:var(--ai);background:var(--ai-soft);box-shadow:inset 0 0 0 1px var(--ai)}
+.term[data-v="1"] .bar{background:var(--t1d)} .term[data-v="2"] .bar{background:var(--t2d)} .term[data-v="3"] .bar{background:var(--t3d)}
+.term .bar{position:absolute;left:10px;right:10px;top:0;height:3px;border-radius:0 0 3px 3px;opacity:.9}
+.setterm{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:9px 14px;cursor:pointer;font-size:14px;line-height:1.2}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--ai);border-color:var(--ai);color:var(--ai-ink);font-weight:700}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--ai)}
+.btn svg{width:18px;height:18px;flex:none}
+.hint{font-size:12.5px;color:var(--sub);margin:0}
+.prog{display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--surface-2);flex:1;min-width:120px}
+.prog i{display:block;height:100%}
+.prog .p1{background:var(--t1d)} .prog .p2{background:var(--t2d)} .prog .p3{background:var(--t3d)}
+
+/* 種類カード */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modes .mode{display:grid;grid-template-columns:48px 1fr;grid-template-rows:auto auto;align-items:center;text-align:left;column-gap:10px;padding:9px 12px}
+.modes .mode .ic{grid-row:1/3;margin:0;width:44px}
+.modes .mode small{margin-top:0}
+.mode{border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:10px 8px 9px;cursor:pointer;text-align:center;line-height:1.3}
+.mode .ic{display:block;width:44px;height:30px;margin:0 auto 6px}
+.mode b{display:block;font-size:14px}
+.mode small{display:block;font-size:11px;color:var(--faint);margin-top:2px}
+@media (max-width:520px){
+  .modes{grid-template-columns:1fr;gap:6px}
+  .mode{display:grid;grid-template-columns:52px 1fr;grid-template-rows:auto auto;align-items:center;text-align:left;column-gap:10px;padding:8px 12px}
+  .mode .ic{grid-row:1/3;margin:0}
+  .mode small{margin-top:0}
+  .top h1{font-size:19px}
+  .top p{font-size:12px}
+  .dock .sum span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+.mode[aria-checked="true"]{border-color:var(--ai);background:var(--ai-soft);box-shadow:inset 0 0 0 1px var(--ai)}
+
+/* くわしい設定 */
+details.more{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+details.more summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ai);font-weight:700;padding:4px 0}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"";width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s;margin-right:2px}
+details.more[open] summary::before{transform:rotate(45deg)}
+details.more summary{flex-wrap:wrap}
+details.more summary span{flex-basis:100%;padding-left:18px;font-weight:400;color:var(--sub);font-size:12px;line-height:1.4}
+.opt{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:8px;margin-top:10px}
+.opt>.lab{font-size:13px;color:var(--sub)}
+.seg{display:flex;background:var(--surface-2);border-radius:var(--r-sm);padding:3px;gap:3px}
+.seg button{flex:1 1 0;min-width:0;border:0;background:transparent;border-radius:5px;padding:7px 4px;cursor:pointer;font-size:13px;line-height:1.25;color:var(--sub)}
+.seg button[aria-checked="true"]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;margin-top:10px;cursor:pointer}
+.sw input{appearance:none;width:42px;height:24px;border-radius:99px;background:var(--line);position:relative;cursor:pointer;flex:none;transition:background .15s}
+.sw input::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s}
+.sw input:checked{background:var(--ai)}
+.sw input:checked::after{transform:translateX(18px)}
+
+/* プレビュー */
+.viewer{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px)}
+@media (max-width:900px){.viewer{position:static}}
+.vhead{display:flex;align-items:center;gap:10px;margin:0 0 10px}
+.vhead h2{margin:0;font-size:15px}
+.tag{font-size:12px;padding:2px 9px;border-radius:99px;background:var(--surface);border:1px solid var(--line);color:var(--sub)}
+.tag.ans{color:var(--shu);border-color:color-mix(in srgb,var(--shu) 40%,var(--line))}
+.pager{margin-left:auto;display:flex;align-items:center;gap:4px}
+.iconbtn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer}
+.iconbtn:disabled{opacity:.35;cursor:default}
+.iconbtn svg{width:18px;height:18px}
+.pnum{min-width:62px;text-align:center;font-variant-numeric:tabular-nums;font-size:14px}
+.paper{position:relative;background:#fff;border-radius:6px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 18px 40px -22px rgba(20,40,70,.45);overflow:hidden;touch-action:pan-y}
+.paper canvas{display:block;width:100%;height:auto}
+.paper.portrait{max-width:min(100%, calc((100vh - 190px) * 0.707));margin:0 auto}
+.dots{display:flex;justify-content:center;gap:5px;margin-top:12px;flex-wrap:wrap}
+.dots button{width:8px;height:8px;border-radius:50%;border:0;padding:0;background:var(--line);cursor:pointer}
+.dots button.a{background:var(--shu);opacity:.45}
+.dots button[aria-current="true"]{background:var(--ai);opacity:1;transform:scale(1.25)}
+.credit{font-size:11px!important;color:var(--faint)!important}
+.vnote{font-size:12.5px;color:var(--sub);margin:10px 2px 0;text-align:center}
+
+/* 下のアクションバー */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+  background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-top:1px solid var(--line)}
+.dock .in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.dock .sum{min-width:0;flex:1;line-height:1.35}
+.dock .sum b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dock .sum span{font-size:12.5px;color:var(--sub)}
+.make{position:relative;overflow:hidden;min-width:168px;padding:13px 20px;font-size:16px;border-radius:12px}
+.make .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.22);transition:width .15s}
+.make > *:not(.fill){position:relative}
+@media (max-width:520px){.make{min-width:0;padding:12px 16px}.dock .sum b{font-size:14px}}
+
+/* シート（学期設定） */
+dialog.sheet{border:0;padding:0;border-radius:18px;width:min(760px,calc(100vw - 24px));max-height:calc(100dvh - 40px);background:var(--surface);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.45);overflow:hidden}
+dialog.sheet::backdrop{background:rgba(15,25,40,.45);backdrop-filter:blur(2px)}
+@media (max-width:600px){
+  dialog.sheet{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;margin:0}
+}
+.sh{display:flex;flex-direction:column;height:100%;max-height:inherit}
+.sh-head{padding:16px 18px 10px;border-bottom:1px solid var(--line);padding-top:calc(16px + env(safe-area-inset-top,0px))}
+.sh-head .row{display:flex;align-items:center;gap:10px}
+.sh-head h3{margin:0;font-size:17px}
+.sh-head p{margin:6px 0 0;font-size:13px;color:var(--sub)}
+.brushes{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.brush{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1.5px solid var(--line);background:var(--surface);border-radius:var(--r-md);padding:7px 10px;cursor:pointer;line-height:1.2}
+.brush b{display:flex;align-items:center;gap:6px;font-size:14px}
+.brush i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.brush small{font-size:11px;color:var(--faint)}
+.brush[data-b="1"] i{background:var(--t1d)} .brush[data-b="2"] i{background:var(--t2d)} .brush[data-b="3"] i{background:var(--t3d)}
+.brush[data-b="0"] i{background:transparent;border:1.5px dashed var(--faint)}
+.brush[aria-checked="true"]{border-color:var(--ai);box-shadow:inset 0 0 0 1px var(--ai);background:var(--ai-soft)}
+.sh-body{padding:14px 18px;overflow:auto;flex:1}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:4px;user-select:none;-webkit-user-select:none;touch-action:none}
+.tgrid button{position:relative;aspect-ratio:1;border:1px solid var(--line);background:var(--surface-2);border-radius:6px;font-size:22px;line-height:1;padding:0;cursor:pointer;color:var(--ink)}
+.tgrid button b{position:absolute;top:2px;left:3px;font-family:"BIZ UDPGothic",sans-serif;font-size:9px;font-weight:700}
+.tgrid button.t1{background:var(--t1);border-color:var(--t1d)} .tgrid button.t1 b{color:var(--t1d)}
+.tgrid button.t2{background:var(--t2);border-color:var(--t2d)} .tgrid button.t2 b{color:var(--t2d)}
+.tgrid button.t3{background:var(--t3);border-color:var(--t3d)} .tgrid button.t3 b{color:var(--t3d)}
+.sh-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--surface)}
+.sh-foot .spacer{flex:1}
+.left{font-size:12.5px;color:var(--sub)}
+
+/* トースト */
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:40;background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:99px;font-size:14px;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+.otext{width:100%;min-height:130px;resize:vertical;padding:10px 12px;border:1.5px solid var(--line);border-radius:var(--r-md);background:var(--surface-2);color:var(--ink);font-size:18px;line-height:1.6}
+.tinput{width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink);font:inherit}
+.dims{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)}
+.dims input{width:64px;padding:7px 8px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink);font:inherit;font-size:15px}
+.wlist{display:flex;flex-direction:column;gap:6px}
+.wrow{display:grid;grid-template-columns:18px 22px minmax(0,1fr) minmax(0,1.1fr) 34px;gap:6px;align-items:center}
+.wrow .no{font-size:11px;color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.wrow input{width:100%;min-width:0;padding:8px 10px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink);font:inherit}
+.wrow input.w{font-family:"Klee One",serif;font-weight:600;font-size:18px}
+.wrow input.y{font-size:15px}
+.wrow input:focus{border-color:var(--ai);background:var(--surface);outline:none;box-shadow:0 0 0 3px var(--ai-soft)}
+.wrow input.auto{color:var(--ai)}
+.wrow .del{width:34px;height:34px;border:0;background:transparent;color:var(--faint);border-radius:50%;cursor:pointer;font-size:18px}
+.wrow .del:hover{background:var(--surface-2);color:var(--shu)}
+.whead{display:grid;grid-template-columns:18px 22px minmax(0,1fr) minmax(0,1.1fr) 34px;gap:6px;font-size:12px;color:var(--sub);margin-bottom:2px}
+.wadd{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.bulk{margin-top:10px}
+.dims2{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.step{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--sub)}
+.step input{width:46px;text-align:center;padding:6px 2px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink);font:inherit;font-size:16px;font-weight:700;-moz-appearance:textfield}
+.step input::-webkit-outer-spin-button,.step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.sbtn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-size:16px;line-height:1;color:var(--ink)}
+.sbtn:hover{border-color:var(--ai);color:var(--ai)}
+.dims2 .x{color:var(--faint)}
+.dims2 .total{font-size:14px;color:var(--sub)} .dims2 .total b{color:var(--ink);font-size:18px}
+.inrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.inlab{font-size:13px;color:var(--sub);font-weight:700}
+.inlab2{font-size:12px;color:var(--faint)}
+.inpanel{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:12px;margin-bottom:12px}
+.inpanel .hint{display:block;margin:0 0 6px}
+.inpanel textarea{background:var(--surface)}
+.tterm{margin-bottom:10px}
+.tterm label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;margin-bottom:4px}
+.tterm label .tc{margin-left:auto;font-weight:400;color:var(--sub);font-size:12px}
+.tterm i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.tterm .d1{background:var(--t1d)} .tterm .d2{background:var(--t2d)} .tterm .d3{background:var(--t3d)}
+.tterm textarea{min-height:58px;font-size:17px}
+.tpre{font-size:15px;letter-spacing:.1em;color:var(--sub);margin-top:4px;min-height:1em;word-break:break-all}
+.tpre .og{color:var(--shu)}
+.warn2{font-size:12.5px;color:var(--shu);margin:4px 0 0;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.warn2:empty{display:none}
+.tsel{display:flex;gap:10px;flex-wrap:wrap}
+.tsel label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)}
+.tsel select{padding:7px 8px;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--surface);color:var(--ink);font:inherit;font-size:15px}
+.order{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);padding:10px 12px;margin-bottom:12px}
+.olab{margin:0 0 6px;font-size:13px;font-weight:700}
+.olab span{font-weight:400;color:var(--faint);font-size:12px;margin-left:6px}
+.orow{display:grid;grid-template-columns:64px 1fr;gap:8px;align-items:start;padding:4px 0}
+.orow .on{font-size:12px;font-weight:700;padding-top:8px;display:flex;align-items:center;gap:5px}
+.orow .on i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.chips{display:flex;flex-wrap:wrap;gap:4px;min-height:40px;padding:3px;border-radius:8px;border:1.5px dashed transparent}
+.chips.empty{border-color:var(--line)}
+.chips.empty::after{content:"ここに漢字をドラッグ";font-size:11px;color:var(--faint);padding:8px}
+.chip{width:36px;height:36px;border-radius:6px;border:1.5px solid var(--line);background:var(--surface);font-size:20px;line-height:1;display:grid;place-items:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;padding:0;color:var(--ink)}
+.chip.t1{border-color:var(--t1d);background:var(--t1)} .chip.t2{border-color:var(--t2d);background:var(--t2)} .chip.t3{border-color:var(--t3d);background:var(--t3)}
+.chip.dragging{opacity:.25}
+.dragghost{position:fixed;z-index:1000;pointer-events:none;transform:translate(-50%,-50%) scale(1.15);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.wrow .handle{cursor:grab;touch-action:none;user-select:none;color:var(--faint);font-size:16px;text-align:center;letter-spacing:-2px}
+.wrow.dragging{opacity:.3}
+#printArea{display:none}
+@media print{
+  @page{size:A4 landscape;margin:0}
+  body{background:#fff}
+  .top,.app,.dock,.toast,dialog{display:none!important}
+  #printArea{display:block}
+  #printArea img{width:297mm;height:210mm;display:block;page-break-after:always;break-after:page}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="mark kan" aria-hidden="true"><span>漢</span></div>
+  <div>
+    <h1 class="kan">漢字テスト・ふくしゅうプリント</h1>
+    <p>小学1〜6年の全1026字。漢字とことばを覚えるテストを、A4縦書きのPDFでつくれます。</p>
+  </div>
+</header>
+
+<main class="app">
+  <div class="panel">
+    <section class="card" aria-labelledby="h-grade">
+      <h2 id="h-grade"><span class="n">1</span>学年<span class="aside" id="gradeAside"></span></h2>
+      <div class="grades" id="grades" role="radiogroup" aria-label="学年"></div>
+    </section>
+
+    <section class="card" aria-labelledby="h-term">
+      <h2 id="h-term"><span class="n">2</span>出題する範囲</h2>
+      <div class="seg tsys" role="radiogroup" aria-label="学期のしくみ" data-key="tsys" style="margin-bottom:10px"><button role="radio" data-v="3">3学期制</button><button role="radio" data-v="2">2学期制（前期・後期）</button></div>
+      <div class="terms" id="terms" role="radiogroup" aria-label="学期"></div>
+      <div class="setterm">
+        <button class="btn" id="openTerms" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span id="openTermsLabel">学期の漢字を設定</span>
+        </button>
+        <div class="prog" id="prog" aria-hidden="true"><i class="p1"></i><i class="p2"></i><i class="p3"></i></div>
+      </div>
+      <p class="hint" id="termHint" style="margin-top:8px"></p>
+    </section>
+
+    <section class="card" aria-labelledby="h-mode">
+      <h2 id="h-mode"><span class="n">3</span>つくるもの</h2>
+      <div class="modes" role="radiogroup" aria-label="つくるもの" data-key="mode">
+        <button class="mode" type="button" role="radio" data-v="test" id="modeTest">
+          <svg class="ic" viewBox="0 0 44 30" aria-hidden="true"><rect x="1" y="1" width="42" height="28" rx="2" fill="none" stroke="currentColor" opacity=".35"/><rect x="28" y="6" width="7" height="7" fill="none" stroke="currentColor"/><rect x="28" y="13" width="7" height="7" fill="none" stroke="currentColor"/><rect x="15" y="6" width="7" height="7" fill="none" stroke="currentColor"/><rect x="15" y="13" width="7" height="7" fill="none" stroke="currentColor"/><path d="M37 7v11M24 7v11" stroke="currentColor" stroke-width="1.2" opacity=".5"/></svg>
+          <b>漢字テスト</b><small>ことば・こたえつき</small>
+        </button>
+        <button class="mode" type="button" role="radio" data-v="practice">
+          <svg class="ic" viewBox="0 0 44 30" aria-hidden="true"><rect x="1" y="1" width="42" height="28" rx="2" fill="none" stroke="currentColor" opacity=".35"/><g fill="none" stroke="currentColor"><rect x="30" y="4" width="6" height="6"/><rect x="30" y="10" width="6" height="6" opacity=".5"/><rect x="30" y="16" width="6" height="6" opacity=".5"/><rect x="22" y="4" width="6" height="6"/><rect x="22" y="10" width="6" height="6" opacity=".5"/><rect x="22" y="16" width="6" height="6" opacity=".5"/><rect x="14" y="4" width="6" height="6"/><rect x="14" y="10" width="6" height="6" opacity=".5"/><rect x="14" y="16" width="6" height="6" opacity=".5"/></g></svg>
+          <b>練習プリント</b><small>お手本・なぞり</small>
+        </button>
+        <button class="mode" type="button" role="radio" data-v="check">
+          <svg class="ic" viewBox="0 0 44 30" aria-hidden="true"><rect x="1" y="1" width="42" height="28" rx="2" fill="none" stroke="currentColor" opacity=".35"/><g fill="none" stroke="currentColor"><rect x="30" y="5" width="6" height="6"/><rect x="21" y="5" width="6" height="6"/><rect x="12" y="5" width="6" height="6"/><rect x="30" y="16" width="6" height="6"/><rect x="21" y="16" width="6" height="6"/><rect x="12" y="16" width="6" height="6"/></g><path d="M31 13.5l1.2 1.2 2.4-2.4M22 13.5l1.2 1.2 2.4-2.4" stroke="currentColor" fill="none"/></svg>
+          <b>かくにん表</b><small>できたらチェック</small>
+        </button>
+        <button class="mode" type="button" role="radio" data-v="otehon">
+          <svg class="ic" viewBox="0 0 44 30" aria-hidden="true"><rect x="1" y="1" width="42" height="28" rx="2" fill="none" stroke="currentColor" opacity=".35"/><g fill="none" stroke="currentColor"><rect x="26" y="4" width="7" height="7"/><rect x="26" y="11" width="7" height="7"/><rect x="26" y="18" width="7" height="7"/><rect x="33" y="4" width="3" height="21" opacity=".5"/><rect x="13" y="4" width="7" height="7"/><rect x="13" y="11" width="7" height="7"/><rect x="13" y="18" width="7" height="7"/><rect x="20" y="4" width="3" height="21" opacity=".5"/></g><path d="M28 7.5h3M15 14.5h3" stroke="currentColor" stroke-width="1.6"/></svg>
+          <b>お手本</b><small>字とよみを入力</small>
+        </button>
+      </div>
+
+      <div class="opt" id="srcRow" style="grid-template-columns:96px 1fr"><span class="lab">問題のことば</span><div class="seg" role="radiogroup" aria-label="問題のことば" data-key="tsrc"><button role="radio" data-v="grade">学年・学期から</button><button role="radio" data-v="custom">自分で入力</button></div></div>
+      <details class="more" id="more">
+        <summary>くわしい設定 <span id="moreSum"></span></summary>
+        <div id="optTest">
+          <div class="opt"><span class="lab">1まいの問題数</span><div class="seg" role="radiogroup" aria-label="1まいの問題数" data-key="qn"><button role="radio" data-v="5">5問</button><button role="radio" data-v="10">10問</button><button role="radio" data-v="20">20問</button></div></div>
+          <div class="opt"><span class="lab">書かせる字</span><div class="seg" role="radiogroup" aria-label="書かせる字" data-key="write"><button role="radio" data-v="all">ことばの漢字ぜんぶ</button><button role="radio" data-v="target">その字だけ</button></div></div>
+          <div class="opt"><span class="lab">こたえ</span><div class="seg" role="radiogroup" aria-label="こたえ" data-key="ans"><button role="radio" data-v="each">1まいごと</button><button role="radio" data-v="end">さいごに</button><button role="radio" data-v="none">なし</button></div></div>
+        </div>
+        <div id="optPractice">
+          <div class="opt"><span class="lab">マスの大きさ</span><div class="seg" role="radiogroup" aria-label="マスの大きさ" data-key="size"><button role="radio" data-v="L">大</button><button role="radio" data-v="M">中</button><button role="radio" data-v="S">小</button></div></div>
+          <label class="sw">うすい字のなぞりマス<input type="checkbox" id="trace" checked></label>
+          <label class="sw">下に「ことば」を書く欄<input type="checkbox" id="pword" checked></label>
+        </div>
+        <div class="opt" id="optLimit"><span class="lab">出題する数</span><div class="seg" role="radiogroup" aria-label="出題する数" data-key="limit"><button role="radio" data-v="all">ぜんぶ</button><button role="radio" data-v="10">10</button><button role="radio" data-v="20">20</button><button role="radio" data-v="30">30</button><button role="radio" data-v="50">50</button></div></div>
+        <div class="opt" id="optOrder"><span class="lab">ならび順</span><div class="seg" role="radiogroup" aria-label="ならび順" data-key="order"><button role="radio" data-v="list" id="orderList">配当表の順</button><button role="radio" data-v="shuffle">バラバラ</button></div></div>
+        <label class="sw">十字の点線<input type="checkbox" id="cross" checked></label>
+        <div id="reshuffleRow" style="margin-top:10px" hidden><button class="btn ghost" id="reshuffle" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>問題をまぜなおす</button></div>
+      </details>
+    </section>
+
+    <section class="card" id="customCard" aria-labelledby="h-cus" hidden>
+      <h2 id="h-cus"><span class="n">1</span>テストに出すことば</h2>
+      <textarea id="ctext" class="otext kan" rows="7" spellcheck="false" aria-describedby="cusHelp" placeholder="運動会 うんどうかい&#10;【泳】ぐ およぐ&#10;駅前 えきまえ"></textarea>
+      <p class="hint" id="cusHelp" style="margin-top:6px">1行に1問、「ことば　よみ」を空白で区切って入れます。ふつうは<b>ことばの漢字がぜんぶ書く字</b>になります。一部の字だけ書かせたいときは【】でかこみます（例：運【動】会 → 「動」だけ書く。ほかの字は印刷）。よみは省略でき、アプリにあることばなら自動で入ります。どの学年の漢字でも使えます。</p>
+      <p class="hint" id="cusCount" style="margin-top:6px;font-weight:700"></p>
+      <div class="opt"><span class="lab">タイトル</span><input class="tinput" id="ctitle" type="text" maxlength="10" placeholder="漢字テスト"></div>
+    </section>
+
+    <section class="card" id="otehonCard" aria-labelledby="h-ote" hidden>
+      <h2 id="h-ote"><span class="n" id="oteN">2</span>お手本にすることばとよみ</h2>
+      <div class="whead" aria-hidden="true"><span></span><span></span><span>ことば</span><span>よみ（ひらがな）</span><span></span></div>
+      <div class="wlist" id="wlist" role="list" aria-label="お手本にすることば"></div>
+      <div class="wadd">
+        <button class="btn" id="wAdd" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>ことばを追加</button>
+        <button class="btn" id="wBulkBtn" type="button" aria-expanded="false" aria-controls="wBulk">まとめて入力</button>
+        <button class="btn" id="wTermBtn" type="button" aria-expanded="false" aria-controls="wTerm">学期の漢字から入れる</button>
+        <button class="btn ghost" id="wClear" type="button">ぜんぶ消す</button>
+      </div>
+      <div class="bulk inpanel" id="wTerm" hidden>
+        <p class="hint">「出題する範囲」で設定した学期（前期・後期）の漢字を、そのままお手本に入れます。</p>
+        <div class="tsel">
+          <label>学年<select id="oteGrade"></select></label>
+          <label>範囲<select id="oteTerm"></select></label>
+        </div>
+        <div class="opt" style="grid-template-columns:70px 1fr"><span class="lab">入れ方</span><div class="seg" role="radiogroup" aria-label="入れ方" data-key="ofrom"><button role="radio" data-v="word">ことばで（運動）</button><button role="radio" data-v="kanji">漢字1字ずつ</button></div></div>
+        <p class="hint" id="wTermInfo" style="margin-top:8px"></p>
+        <div class="wadd"><button class="btn primary" id="wTermReplace" type="button">入力欄をこれにする</button><button class="btn" id="wTermAppend" type="button">下に追加する</button></div>
+      </div>
+      <div class="bulk" id="wBulk" hidden>
+        <textarea id="wBulkText" class="otext kan" rows="6" spellcheck="false" placeholder="起承転結 き しょう てん けつ&#10;学校 がっ こう&#10;休む やすむ&#10;大きい&#10;（1行に1つ。区切ると1字ずつのよみ。よみは空白のあとに。アプリにあることばは、よみを書かなくても自動で入ります）"></textarea>
+        <div class="wadd"><button class="btn primary" id="wBulkReplace" type="button">入力欄をこれにする</button><button class="btn" id="wBulkAppend" type="button">下に追加する</button></div>
+      </div>
+      <p class="hint" id="oteHelp" style="margin-top:8px">左に「ことば」、右に「よみ」を入れます。Enterキーで次の欄へ進みます。たくさんある時は「まとめて入力」に貼り付けると、1ページに入りきらない分は次のページへ続きます。マスがあまると、最初のことばから くり返してうめます。アプリに入っていることば（学校・休む など）なら、よみが自動で入ります。よみは漢字の横に付きます。<b>熟語のよみは、ふつうに「きしょうてんけつ」と入れれば1字ずつに分けて付きます</b>（分け方を自分で決めたいときは、空白か「・」で区切ります）。</p>
+      <div class="opt"><span class="lab">タイトル</span><input class="tinput" id="otitle" type="text" maxlength="12" placeholder="お手本"></div>
+      <div class="opt"><span class="lab">マス目</span>
+        <div class="dims2">
+          <div class="step"><span>たて</span><button type="button" class="sbtn" data-d="orows:-1" aria-label="たてを1へらす">−</button><input type="number" id="orows" min="3" max="20" aria-label="たてのマス数"><button type="button" class="sbtn" data-d="orows:1" aria-label="たてを1ふやす">＋</button></div>
+          <div class="step"><span>よこ</span><button type="button" class="sbtn" data-d="ocols:-1" aria-label="よこを1へらす">−</button><input type="number" id="ocols" min="1" max="12" aria-label="よこの列数"><button type="button" class="sbtn" data-d="ocols:1" aria-label="よこを1ふやす">＋</button></div>
+          <span class="total">ぜんぶで <b id="oTotal">50</b> マス</span>
+        </div>
+      </div>
+      <div class="opt"><span class="lab">字の色</span><div class="seg" role="radiogroup" aria-label="字の色" data-key="ocolor"><button role="radio" data-v="black">お手本（黒）</button><button role="radio" data-v="gray">なぞり（うすい）</button></div></div>
+      <label class="sw">読みがなの欄<input type="checkbox" id="oruby" checked></label>
+      <label class="sw">ことばごとに次の列から書く<input type="checkbox" id="onewcol"></label>
+      <label class="sw">マスがあまったら、ことばをくり返してうめる<input type="checkbox" id="ofill" checked></label>
+      <label class="sw">ひらがなは1マスに2文字入れる<input type="checkbox" id="okana2"></label>
+    </section>
+  </div>
+
+  <section class="viewer" aria-labelledby="h-prev">
+    <div class="vhead">
+      <h2 id="h-prev">プレビュー</h2>
+      <span class="tag" id="pageKind">問題</span>
+      <div class="pager">
+        <button class="iconbtn" id="prev" type="button" aria-label="前のページ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+        <span class="pnum" id="pageLabel" aria-live="polite">1 / 1</span>
+        <button class="iconbtn" id="next" type="button" aria-label="次のページ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      </div>
+    </div>
+    <div class="paper" id="paper"><canvas id="preview" width="1188" height="840" role="img" aria-label="プリントのプレビュー"></canvas></div>
+    <div class="dots" id="dots"></div>
+    <p class="vnote">A4横・縦書き。左右にスワイプ（パソコンは ← → キー）でページをめくれます。</p>
+    <p class="vnote credit">バージョン <span id="appVer">1.0.0</span>（<a href="https://github.com/uramotokou-hash/kanji-print/blob/main/CHANGELOG.md" target="_blank" rel="noopener" style="color:inherit">更新のきろく</a>）</p>
+    <p class="vnote credit">熟語のよみを1字ずつに分ける処理に、KANJIDIC（© Electronic Dictionary Research and Development Group, CC BY-SA 4.0）の読みデータを使用しています。</p>
+  </section>
+</main>
+
+<div class="dock" role="region" aria-label="作成">
+  <div class="in">
+    <div class="sum"><b id="sumMain"></b><span id="sumSub"></span></div>
+    <button class="btn iconbtn" id="print" type="button" aria-label="印刷する" title="印刷する" style="width:46px;height:46px;border-radius:12px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg>
+    </button>
+    <button class="btn primary make" id="make" type="button"><span class="fill" id="makeFill"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+      <span id="makeLabel">PDFをつくる</span>
+    </button>
+  </div>
+</div>
+
+<dialog class="sheet" id="sheet" aria-labelledby="sheetTitle">
+  <div class="sh">
+    <div class="sh-head">
+      <div class="row">
+        <h3 id="sheetTitle">学期の漢字を設定</h3>
+        <button class="iconbtn" id="closeSheet" type="button" aria-label="とじる" style="margin-left:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </div>
+      <p>学期をえらんで、その学期に習う漢字を入れます。文字で入力するか、下の字をタップして入れます（タップはなぞると続けて塗れます）。教科書の巻末の漢字一覧の順にタップすると、その順で出題されます。設定はこの端末だけに保存されます。</p>
+      <div class="brushes" id="brushes" role="radiogroup" aria-label="塗る学期">
+        <button class="brush" type="button" role="radio" data-b="1"><b><i></i><span id="bn1">1学期</span></b><small id="c1"></small></button>
+        <button class="brush" type="button" role="radio" data-b="2"><b><i></i><span id="bn2">2学期</span></b><small id="c2"></small></button>
+        <button class="brush" type="button" role="radio" data-b="3"><b><i></i><span id="bn3">3学期</span></b><small id="c3"></small></button>
+        <button class="brush" type="button" role="radio" data-b="0"><b><i></i>外す</b><small>タップで外す</small></button>
+      </div>
+    </div>
+    <div class="sh-body">
+      <div class="inrow">
+        <span class="inlab">入れ方</span>
+        <button class="btn" id="typeBtn" type="button" aria-expanded="false" aria-controls="typePanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h1M11 10h1M15 10h2M7 14h10"/></svg>文字で入力</button>
+        <span class="inlab2">または下の字をタップ</span>
+      </div>
+      <div class="inpanel" id="typePanel" hidden>
+        <p class="hint">期間ごとに、習う漢字を打つか貼り付けてください。<b>熟語やことばのまま入れても大丈夫です</b>（例：「運動会　泳ぐ　駅前」）。打つとすぐに下のマスに反映されます。熟語の中から、この学年の漢字だけを取り出して入れます（ほかの学年の字やかなは入りません）。</p>
+        <div class="tterm"><label for="tt1"><i class="d1"></i><span id="tn1">1学期（4〜7月）</span><span class="tc" id="tc1"></span></label><textarea id="tt1" class="otext kan" rows="2" spellcheck="false" placeholder="例：悪い　安心　暗記　医者…"></textarea><div class="tpre kan" id="tp1"></div></div>
+        <div class="tterm"><label for="tt2"><i class="d2"></i><span id="tn2">2学期（9〜12月）</span><span class="tc" id="tc2"></span></label><textarea id="tt2" class="otext kan" rows="2" spellcheck="false"></textarea><div class="tpre kan" id="tp2"></div></div>
+        <div class="tterm"><label for="tt3"><i class="d3"></i><span id="tn3">3学期（1〜3月）</span><span class="tc" id="tc3"></span></label><textarea id="tt3" class="otext kan" rows="2" spellcheck="false"></textarea><div class="tpre kan" id="tp3"></div></div>
+        <p class="hint" id="typeCount" role="status" style="margin:4px 0 0"></p>
+        <p class="warn2" id="typeWarn"></p>
+      </div>
+      <div class="order" id="orderBox" hidden>
+        <p class="olab">順番を入れかえる <span>漢字をドラッグして動かせます（ほかの学期へも移せます）。キーボードでは字をえらんで ← → キー。</span></p>
+        <div id="orderLists"></div>
+      </div>
+      <div class="tgrid kan" id="tgrid"></div>
+    </div>
+    <div class="sh-foot">
+      <span class="left" id="leftCount"></span>
+      <button class="btn" id="fillRest" type="button"></button>
+      <span class="spacer"></span>
+      <button class="btn ghost" id="termReset" type="button">すべて消す</button>
+      <button class="btn primary" id="doneSheet" type="button">完了</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="printArea" aria-hidden="true"></div>
+
+<script>
+const KANJI = {"1": "一右雨円王音下火花貝学気九休玉金空月犬見五口校左三山子四糸字耳七車手十出女小上森人水正生青夕石赤千川先早草足村大男竹中虫町天田土二日入年白八百文木本名目立力林六", "2": "引羽雲園遠何科夏家歌画回会海絵外角楽活間丸岩顔汽記帰弓牛魚京強教近兄形計元言原戸古午後語工公広交光考行高黄合谷国黒今才細作算止市矢姉思紙寺自時室社弱首秋週春書少場色食心新親図数西声星晴切雪船線前組走多太体台地池知茶昼長鳥朝直通弟店点電刀冬当東答頭同道読内南肉馬売買麦半番父風分聞米歩母方北毎妹万明鳴毛門夜野友用曜来里理話", "3": "悪安暗医委意育員院飲運泳駅央横屋温化荷界開階寒感漢館岸起期客究急級宮球去橋業曲局銀区苦具君係軽血決研県庫湖向幸港号根祭皿仕死使始指歯詩次事持式実写者主守取酒受州拾終習集住重宿所暑助昭消商章勝乗植申身神真深進世整昔全相送想息速族他打対待代第題炭短談着注柱丁帳調追定庭笛鉄転都度投豆島湯登等動童農波配倍箱畑発反坂板皮悲美鼻筆氷表秒病品負部服福物平返勉放味命面問役薬由油有遊予羊洋葉陽様落流旅両緑礼列練路和", "4": "愛案以衣位茨印英栄媛塩岡億加果貨課芽賀改械害街各覚潟完官管関観願岐希季旗器機議求泣給挙漁共協鏡競極熊訓軍郡群径景芸欠結建健験固功好香候康佐差菜最埼材崎昨札刷察参産散残氏司試児治滋辞鹿失借種周祝順初松笑唱焼照城縄臣信井成省清静席積折節説浅戦選然争倉巣束側続卒孫帯隊達単置仲沖兆低底的典伝徒努灯働特徳栃奈梨熱念敗梅博阪飯飛必票標不夫付府阜富副兵別辺変便包法望牧末満未民無約勇要養浴利陸良料量輪類令冷例連老労録", "5": "圧囲移因永営衛易益液演応往桜可仮価河過快解格確額刊幹慣眼紀基寄規喜技義逆久旧救居許境均禁句型経潔件険検限現減故個護効厚耕航鉱構興講告混査再災妻採際在財罪殺雑酸賛士支史志枝師資飼示似識質舎謝授修述術準序招証象賞条状常情織職制性政勢精製税責績接設絶祖素総造像増則測属率損貸態団断築貯張停提程適統堂銅導得毒独任燃能破犯判版比肥非費備評貧布婦武復複仏粉編弁保墓報豊防貿暴脈務夢迷綿輸余容略留領歴", "6": "胃異遺域宇映延沿恩我灰拡革閣割株干巻看簡危机揮貴疑吸供胸郷勤筋系敬警劇激穴券絹権憲源厳己呼誤后孝皇紅降鋼刻穀骨困砂座済裁策冊蚕至私姿視詞誌磁射捨尺若樹収宗就衆従縦縮熟純処署諸除承将傷障蒸針仁垂推寸盛聖誠舌宣専泉洗染銭善奏窓創装層操蔵臓存尊退宅担探誕段暖値宙忠著庁頂腸潮賃痛敵展討党糖届難乳認納脳派拝背肺俳班晩否批秘俵腹奮並陛閉片補暮宝訪亡忘棒枚幕密盟模訳郵優預幼欲翌乱卵覧裏律臨朗論"};
+const JUKU = {"1":[["一","一年生","いちねんせい"],["右","右手","みぎて"],["雨","大雨","おおあめ"],["円","百円","ひゃくえん"],["王","王さま","おうさま"],["音","音がく","おんがく"],["下","下がる","さがる"],["火","火よう日","かようび"],["花","花火","はなび"],["貝","貝がら","かいがら"],["学","学ぶ","まなぶ"],["気","気もち","きもち"],["九","九月","くがつ"],["休","休む","やすむ"],["玉","玉入れ","たまいれ"],["金","金よう日","きんようび"],["空","空気","くうき"],["月","月よう日","げつようび"],["犬","子犬","こいぬ"],["見","見る","みる"],["五","五つ","いつつ"],["口","入り口","いりぐち"],["校","学校","がっこう"],["左","左手","ひだりて"],["三","三つ","みっつ"],["山","火山","かざん"],["子","子ども","こども"],["四","四つ","よっつ"],["糸","糸でんわ","いとでんわ"],["字","名字","みょうじ"],["耳","耳","みみ"],["七","七夕","たなばた"],["車","車","くるま"],["手","上手","じょうず"],["十","十円","じゅうえん"],["出","出口","でぐち"],["女","女の子","おんなのこ"],["小","小さい","ちいさい"],["上","上がる","あがる"],["森","森","もり"],["人","大人","おとな"],["水","水よう日","すいようび"],["正","正月","しょうがつ"],["生","生まれる","うまれる"],["青","青空","あおぞら"],["夕","夕日","ゆうひ"],["石","小石","こいし"],["赤","赤ちゃん","あかちゃん"],["千","千円","せんえん"],["川","小川","おがわ"],["先","先生","せんせい"],["早","早おき","はやおき"],["草","草花","くさばな"],["足","足音","あしおと"],["村","村人","むらびと"],["大","大きい","おおきい"],["男","男の子","おとこのこ"],["竹","竹とんぼ","たけとんぼ"],["中","まん中","まんなか"],["虫","虫かご","むしかご"],["町","町","まち"],["天","天気","てんき"],["田","田んぼ","たんぼ"],["土","土よう日","どようび"],["二","二人","ふたり"],["日","日よう日","にちようび"],["入","入学","にゅうがく"],["年","学年","がくねん"],["白","白い","しろい"],["八","八つ","やっつ"],["百","百てん","ひゃくてん"],["文","文字","もじ"],["木","木よう日","もくようび"],["本","本だな","ほんだな"],["名","名まえ","なまえ"],["目","目玉","めだま"],["立","立つ","たつ"],["力","力もち","ちからもち"],["林","林","はやし"],["六","六つ","むっつ"]],"2":[["引","引く","ひく"],["羽","羽","はね"],["雲","雨雲","あまぐも"],["園","ようち園","ようちえん"],["遠","遠足","えんそく"],["何","何人","なんにん"],["科","教科","きょうか"],["夏","夏休み","なつやすみ"],["家","家","いえ"],["歌","歌う","うたう"],["画","画用紙","がようし"],["回","回る","まわる"],["会","会う","あう"],["海","海","うみ"],["絵","絵本","えほん"],["外","外","そと"],["角","三角","さんかく"],["楽","楽しい","たのしい"],["活","生活","せいかつ"],["間","時間","じかん"],["丸","丸い","まるい"],["岩","岩山","いわやま"],["顔","顔","かお"],["汽","汽車","きしゃ"],["記","日記","にっき"],["帰","帰る","かえる"],["弓","弓","ゆみ"],["牛","牛にゅう","ぎゅうにゅう"],["魚","金魚","きんぎょ"],["京","東京","とうきょう"],["強","強い","つよい"],["教","教える","おしえる"],["近","近い","ちかい"],["兄","お兄さん","おにいさん"],["形","人形","にんぎょう"],["計","時計","とけい"],["元","元気","げんき"],["言","言う","いう"],["原","原っぱ","はらっぱ"],["戸","戸じまり","とじまり"],["古","古い","ふるい"],["午","午前","ごぜん"],["後","後ろ","うしろ"],["語","国語","こくご"],["工","工作","こうさく"],["公","公園","こうえん"],["広","広い","ひろい"],["交","交番","こうばん"],["光","光る","ひかる"],["考","考える","かんがえる"],["行","行く","いく"],["高","高い","たかい"],["黄","黄色","きいろ"],["合","合計","ごうけい"],["谷","谷","たに"],["国","外国","がいこく"],["黒","黒ばん","こくばん"],["今","今日","きょう"],["才","五才","ごさい"],["細","細い","ほそい"],["作","作る","つくる"],["算","計算","けいさん"],["止","止まる","とまる"],["市","市場","いちば"],["矢","矢じるし","やじるし"],["姉","お姉さん","おねえさん"],["思","思う","おもう"],["紙","手紙","てがみ"],["寺","お寺","おてら"],["自","自分","じぶん"],["時","時こく","じこく"],["室","教室","きょうしつ"],["社","会社","かいしゃ"],["弱","弱い","よわい"],["首","首","くび"],["秋","秋","あき"],["週","今週","こんしゅう"],["春","春","はる"],["書","書く","かく"],["少","少し","すこし"],["場","広場","ひろば"],["色","色えんぴつ","いろえんぴつ"],["食","食べる","たべる"],["心","心","こころ"],["新","新しい","あたらしい"],["親","親子","おやこ"],["図","図工","ずこう"],["数","数える","かぞえる"],["西","西","にし"],["声","大声","おおごえ"],["星","星","ほし"],["晴","晴れ","はれ"],["切","切る","きる"],["雪","雪だるま","ゆきだるま"],["船","船","ふね"],["線","直線","ちょくせん"],["前","名前","なまえ"],["組","番組","ばんぐみ"],["走","走る","はしる"],["多","多い","おおい"],["太","太い","ふとい"],["体","体そう","たいそう"],["台","台風","たいふう"],["地","地図","ちず"],["池","池","いけ"],["知","知る","しる"],["茶","茶色","ちゃいろ"],["昼","昼休み","ひるやすみ"],["長","長い","ながい"],["鳥","小鳥","ことり"],["朝","朝ごはん","あさごはん"],["直","直す","なおす"],["通","通る","とおる"],["弟","弟","おとうと"],["店","お店","おみせ"],["点","点数","てんすう"],["電","電車","でんしゃ"],["刀","刀","かたな"],["冬","冬休み","ふゆやすみ"],["当","本当","ほんとう"],["東","東西","とうざい"],["答","答え","こたえ"],["頭","頭","あたま"],["同","同じ","おなじ"],["道","道","みち"],["読","読む","よむ"],["内","内がわ","うちがわ"],["南","南北","なんぼく"],["肉","牛肉","ぎゅうにく"],["馬","馬","うま"],["売","売る","うる"],["買","買う","かう"],["麦","麦茶","むぎちゃ"],["半","半分","はんぶん"],["番","一番","いちばん"],["父","お父さん","おとうさん"],["風","風","かぜ"],["分","分ける","わける"],["聞","聞く","きく"],["米","米","こめ"],["歩","歩く","あるく"],["母","お母さん","おかあさん"],["方","夕方","ゆうがた"],["北","北海道","ほっかいどう"],["毎","毎日","まいにち"],["妹","妹","いもうと"],["万","一万","いちまん"],["明","明るい","あかるい"],["鳴","鳴く","なく"],["毛","毛糸","けいと"],["門","校門","こうもん"],["夜","夜","よる"],["野","野原","のはら"],["友","友だち","ともだち"],["用","用紙","ようし"],["曜","曜日","ようび"],["来","来る","くる"],["里","里山","さとやま"],["理","理科","りか"],["話","話す","はなす"]],"3":[["悪","悪い","わるい"],["安","安心","あんしん"],["暗","暗い","くらい"],["医","医者","いしゃ"],["委","委員","いいん"],["意","意見","いけん"],["育","体育","たいいく"],["員","店員","てんいん"],["院","病院","びょういん"],["飲","飲む","のむ"],["運","運動","うんどう"],["泳","泳ぐ","およぐ"],["駅","駅","えき"],["央","中央","ちゅうおう"],["横","横","よこ"],["屋","屋根","やね"],["温","気温","きおん"],["化","化石","かせき"],["荷","荷物","にもつ"],["界","世界","せかい"],["開","開く","ひらく"],["階","二階","にかい"],["寒","寒い","さむい"],["感","感動","かんどう"],["漢","漢字","かんじ"],["館","図書館","としょかん"],["岸","海岸","かいがん"],["起","起きる","おきる"],["期","学期","がっき"],["客","お客さん","おきゃくさん"],["究","研究","けんきゅう"],["急","急ぐ","いそぐ"],["級","学級","がっきゅう"],["宮","神宮","じんぐう"],["球","地球","ちきゅう"],["去","去年","きょねん"],["橋","橋","はし"],["業","作業","さぎょう"],["曲","曲がる","まがる"],["局","薬局","やっきょく"],["銀","銀行","ぎんこう"],["区","区役所","くやくしょ"],["苦","苦手","にがて"],["具","道具","どうぐ"],["君","君たち","きみたち"],["係","生き物係","いきものがかり"],["軽","軽い","かるい"],["血","血えき","けつえき"],["決","決める","きめる"],["研","研究","けんきゅう"],["県","県大会","けんたいかい"],["庫","車庫","しゃこ"],["湖","湖","みずうみ"],["向","向かう","むかう"],["幸","幸せ","しあわせ"],["港","空港","くうこう"],["号","番号","ばんごう"],["根","大根","だいこん"],["祭","祭り","まつり"],["皿","お皿","おさら"],["仕","仕事","しごと"],["死","死ぬ","しぬ"],["使","使う","つかう"],["始","始まる","はじまる"],["指","指","ゆび"],["歯","歯","は"],["詩","詩","し"],["次","次","つぎ"],["事","火事","かじ"],["持","気持ち","きもち"],["式","入学式","にゅうがくしき"],["実","木の実","きのみ"],["写","写す","うつす"],["者","作者","さくしゃ"],["主","主人公","しゅじんこう"],["守","守る","まもる"],["取","取る","とる"],["酒","酒屋","さかや"],["受","受ける","うける"],["州","九州","きゅうしゅう"],["拾","拾う","ひろう"],["終","終わる","おわる"],["習","習う","ならう"],["集","集める","あつめる"],["住","住む","すむ"],["重","重い","おもい"],["宿","宿題","しゅくだい"],["所","場所","ばしょ"],["暑","暑い","あつい"],["助","助ける","たすける"],["昭","昭和","しょうわ"],["消","消す","けす"],["商","商店","しょうてん"],["章","文章","ぶんしょう"],["勝","勝つ","かつ"],["乗","乗る","のる"],["植","植える","うえる"],["申","申しこむ","もうしこむ"],["身","身長","しんちょう"],["神","神社","じんじゃ"],["真","写真","しゃしん"],["深","深い","ふかい"],["進","進む","すすむ"],["世","世の中","よのなか"],["整","整列","せいれつ"],["昔","昔話","むかしばなし"],["全","全部","ぜんぶ"],["相","相手","あいて"],["送","送る","おくる"],["想","感想","かんそう"],["息","息","いき"],["速","速い","はやい"],["族","家族","かぞく"],["他","他","ほか"],["打","打つ","うつ"],["対","反対","はんたい"],["待","待つ","まつ"],["代","時代","じだい"],["第","第一","だいいち"],["題","題名","だいめい"],["炭","炭","すみ"],["短","短い","みじかい"],["談","相談","そうだん"],["着","着る","きる"],["注","注意","ちゅうい"],["柱","柱","はしら"],["丁","一丁目","いっちょうめ"],["帳","自由帳","じゆうちょう"],["調","調べる","しらべる"],["追","追う","おう"],["定","予定","よてい"],["庭","庭","にわ"],["笛","口笛","くちぶえ"],["鉄","鉄ぼう","てつぼう"],["転","転ぶ","ころぶ"],["都","京都","きょうと"],["度","温度","おんど"],["投","投げる","なげる"],["豆","大豆","だいず"],["島","島","しま"],["湯","お湯","おゆ"],["登","登る","のぼる"],["等","一等","いっとう"],["動","動物","どうぶつ"],["童","童話","どうわ"],["農","農家","のうか"],["波","波","なみ"],["配","心配","しんぱい"],["倍","二倍","にばい"],["箱","箱","はこ"],["畑","畑","はたけ"],["発","出発","しゅっぱつ"],["反","反発","はんぱつ"],["坂","坂道","さかみち"],["板","黒板","こくばん"],["皮","皮","かわ"],["悲","悲しい","かなしい"],["美","美しい","うつくしい"],["鼻","鼻","はな"],["筆","筆箱","ふでばこ"],["氷","氷","こおり"],["表","発表","はっぴょう"],["秒","一秒","いちびょう"],["病","病気","びょうき"],["品","品物","しなもの"],["負","負ける","まける"],["部","部屋","へや"],["服","洋服","ようふく"],["福","福引き","ふくびき"],["物","物語","ものがたり"],["平","平ら","たいら"],["返","返事","へんじ"],["勉","勉強","べんきょう"],["放","放送","ほうそう"],["味","意味","いみ"],["命","命","いのち"],["面","地面","じめん"],["問","問題","もんだい"],["役","役目","やくめ"],["薬","薬","くすり"],["由","自由","じゆう"],["油","油","あぶら"],["有","有名","ゆうめい"],["遊","遊ぶ","あそぶ"],["予","予習","よしゅう"],["羊","羊","ひつじ"],["洋","西洋","せいよう"],["葉","言葉","ことば"],["陽","太陽","たいよう"],["様","王様","おうさま"],["落","落ちる","おちる"],["流","流れる","ながれる"],["旅","旅行","りょこう"],["両","両手","りょうて"],["緑","緑色","みどりいろ"],["礼","お礼","おれい"],["列","行列","ぎょうれつ"],["練","練習","れんしゅう"],["路","道路","どうろ"],["和","平和","へいわ"]],"4":[["愛","愛する","あいする"],["案","案内","あんない"],["以","以上","いじょう"],["衣","衣服","いふく"],["位","順位","じゅんい"],["茨","茨城県","いばらきけん"],["印","目印","めじるし"],["英","英語","えいご"],["栄","栄える","さかえる"],["媛","愛媛県","えひめけん"],["塩","塩","しお"],["岡","岡山県","おかやまけん"],["億","一億","いちおく"],["加","加える","くわえる"],["果","果物","くだもの"],["貨","貨物","かもつ"],["課","課題","かだい"],["芽","新芽","しんめ"],["賀","年賀じょう","ねんがじょう"],["改","改める","あらためる"],["械","機械","きかい"],["害","害虫","がいちゅう"],["街","商店街","しょうてんがい"],["各","各地","かくち"],["覚","覚える","おぼえる"],["潟","新潟県","にいがたけん"],["完","完成","かんせい"],["官","外交官","がいこうかん"],["管","水道管","すいどうかん"],["関","関係","かんけい"],["観","観光","かんこう"],["願","願う","ねがう"],["岐","岐阜県","ぎふけん"],["希","希望","きぼう"],["季","四季","しき"],["旗","旗","はた"],["器","楽器","がっき"],["機","飛行機","ひこうき"],["議","会議","かいぎ"],["求","求める","もとめる"],["泣","泣く","なく"],["給","給食","きゅうしょく"],["挙","挙手","きょしゅ"],["漁","漁業","ぎょぎょう"],["共","共通","きょうつう"],["協","協力","きょうりょく"],["鏡","鏡","かがみ"],["競","競走","きょうそう"],["極","南極","なんきょく"],["熊","熊本県","くまもとけん"],["訓","訓練","くんれん"],["軍","軍手","ぐんて"],["郡","郡","ぐん"],["群","群馬県","ぐんまけん"],["径","直径","ちょっけい"],["景","景色","けしき"],["芸","工芸","こうげい"],["欠","欠席","けっせき"],["結","結ぶ","むすぶ"],["建","建物","たてもの"],["健","健康","けんこう"],["験","実験","じっけん"],["固","固い","かたい"],["功","成功","せいこう"],["好","好き","すき"],["香","香川県","かがわけん"],["候","天候","てんこう"],["康","健康","けんこう"],["佐","佐賀県","さがけん"],["差","差す","さす"],["菜","野菜","やさい"],["最","最高","さいこう"],["埼","埼玉県","さいたまけん"],["材","材料","ざいりょう"],["崎","長崎県","ながさきけん"],["昨","昨日","きのう"],["札","お札","おさつ"],["刷","印刷","いんさつ"],["察","観察","かんさつ"],["参","参加","さんか"],["産","産む","うむ"],["散","散歩","さんぽ"],["残","残念","ざんねん"],["氏","氏名","しめい"],["司","司会","しかい"],["試","試合","しあい"],["児","児童","じどう"],["治","治る","なおる"],["滋","滋賀県","しがけん"],["辞","辞書","じしょ"],["鹿","鹿児島県","かごしまけん"],["失","失う","うしなう"],["借","借りる","かりる"],["種","種","たね"],["周","一周","いっしゅう"],["祝","祝う","いわう"],["順","順番","じゅんばん"],["初","初め","はじめ"],["松","松","まつ"],["笑","笑顔","えがお"],["唱","合唱","がっしょう"],["焼","夕焼け","ゆうやけ"],["照","照らす","てらす"],["城","城","しろ"],["縄","縄とび","なわとび"],["臣","大臣","だいじん"],["信","信号","しんごう"],["井","井戸","いど"],["成","成長","せいちょう"],["省","反省","はんせい"],["清","清書","せいしょ"],["静","静か","しずか"],["席","出席","しゅっせき"],["積","面積","めんせき"],["折","折る","おる"],["節","季節","きせつ"],["説","説明","せつめい"],["浅","浅い","あさい"],["戦","戦う","たたかう"],["選","選手","せんしゅ"],["然","自然","しぜん"],["争","争う","あらそう"],["倉","倉庫","そうこ"],["巣","巣箱","すばこ"],["束","花束","はなたば"],["側","両側","りょうがわ"],["続","続く","つづく"],["卒","卒業","そつぎょう"],["孫","孫","まご"],["帯","包帯","ほうたい"],["隊","隊長","たいちょう"],["達","友達","ともだち"],["単","単語","たんご"],["置","置く","おく"],["仲","仲間","なかま"],["沖","沖縄県","おきなわけん"],["兆","一兆","いっちょう"],["低","低い","ひくい"],["底","底","そこ"],["的","目的","もくてき"],["典","辞典","じてん"],["伝","伝える","つたえる"],["徒","生徒","せいと"],["努","努力","どりょく"],["灯","電灯","でんとう"],["働","働く","はたらく"],["特","特別","とくべつ"],["徳","道徳","どうとく"],["栃","栃木県","とちぎけん"],["奈","奈良県","ならけん"],["梨","山梨県","やまなしけん"],["熱","熱い","あつい"],["念","記念","きねん"],["敗","失敗","しっぱい"],["梅","梅の花","うめのはな"],["博","博物館","はくぶつかん"],["阪","大阪府","おおさかふ"],["飯","ご飯","ごはん"],["飛","飛ぶ","とぶ"],["必","必ず","かならず"],["票","投票","とうひょう"],["標","目標","もくひょう"],["不","不足","ふそく"],["夫","工夫","くふう"],["付","付ける","つける"],["府","京都府","きょうとふ"],["阜","岐阜県","ぎふけん"],["富","富山県","とやまけん"],["副","副会長","ふくかいちょう"],["兵","兵隊","へいたい"],["別","区別","くべつ"],["辺","周辺","しゅうへん"],["変","変わる","かわる"],["便","便利","べんり"],["包","包む","つつむ"],["法","方法","ほうほう"],["望","望む","のぞむ"],["牧","牧場","ぼくじょう"],["末","週末","しゅうまつ"],["満","満足","まんぞく"],["未","未来","みらい"],["民","国民","こくみん"],["無","無理","むり"],["約","約束","やくそく"],["勇","勇気","ゆうき"],["要","必要","ひつよう"],["養","栄養","えいよう"],["浴","浴びる","あびる"],["利","利用","りよう"],["陸","大陸","たいりく"],["良","良い","よい"],["料","料理","りょうり"],["量","分量","ぶんりょう"],["輪","指輪","ゆびわ"],["類","種類","しゅるい"],["令","号令","ごうれい"],["冷","冷たい","つめたい"],["例","例えば","たとえば"],["連","連休","れんきゅう"],["老","老人","ろうじん"],["労","苦労","くろう"],["録","記録","きろく"]],"5":[["圧","気圧","きあつ"],["囲","囲む","かこむ"],["移","移る","うつる"],["因","原因","げんいん"],["永","永い","ながい"],["営","営む","いとなむ"],["衛","衛生","えいせい"],["易","易しい","やさしい"],["益","利益","りえき"],["液","液体","えきたい"],["演","演技","えんぎ"],["応","応える","こたえる"],["往","往復","おうふく"],["桜","桜","さくら"],["可","可能","かのう"],["仮","仮面","かめん"],["価","価格","かかく"],["河","銀河","ぎんが"],["過","過ぎる","すぎる"],["快","快晴","かいせい"],["解","解く","とく"],["格","合格","ごうかく"],["確","確かめる","たしかめる"],["額","金額","きんがく"],["刊","週刊","しゅうかん"],["幹","新幹線","しんかんせん"],["慣","慣れる","なれる"],["眼","眼鏡","めがね"],["紀","世紀","せいき"],["基","基本","きほん"],["寄","寄る","よる"],["規","定規","じょうぎ"],["喜","喜ぶ","よろこぶ"],["技","技術","ぎじゅつ"],["義","義務","ぎむ"],["逆","逆","ぎゃく"],["久","久しぶり","ひさしぶり"],["旧","旧式","きゅうしき"],["救","救う","すくう"],["居","居間","いま"],["許","許可","きょか"],["境","国境","こっきょう"],["均","平均","へいきん"],["禁","禁止","きんし"],["句","文句","もんく"],["型","大型","おおがた"],["経","経験","けいけん"],["潔","清潔","せいけつ"],["件","事件","じけん"],["険","険しい","けわしい"],["検","点検","てんけん"],["限","限る","かぎる"],["現","現れる","あらわれる"],["減","減る","へる"],["故","事故","じこ"],["個","個人","こじん"],["護","保護","ほご"],["効","効果","こうか"],["厚","厚い","あつい"],["耕","耕す","たがやす"],["航","航海","こうかい"],["鉱","鉱物","こうぶつ"],["構","構成","こうせい"],["興","興味","きょうみ"],["講","講堂","こうどう"],["告","広告","こうこく"],["混","混ぜる","まぜる"],["査","検査","けんさ"],["再","再び","ふたたび"],["災","災害","さいがい"],["妻","妻","つま"],["採","採集","さいしゅう"],["際","国際","こくさい"],["在","現在","げんざい"],["財","財産","ざいさん"],["罪","犯罪","はんざい"],["殺","殺虫","さっちゅう"],["雑","雑草","ざっそう"],["酸","酸素","さんそ"],["賛","賛成","さんせい"],["士","消防士","しょうぼうし"],["支","支える","ささえる"],["史","日本史","にほんし"],["志","志","こころざし"],["枝","枝","えだ"],["師","教師","きょうし"],["資","資料","しりょう"],["飼","飼う","かう"],["示","示す","しめす"],["似","似顔絵","にがおえ"],["識","知識","ちしき"],["質","質問","しつもん"],["舎","校舎","こうしゃ"],["謝","感謝","かんしゃ"],["授","授業","じゅぎょう"],["修","修理","しゅうり"],["述","述べる","のべる"],["術","手術","しゅじゅつ"],["準","準備","じゅんび"],["序","順序","じゅんじょ"],["招","招く","まねく"],["証","証明","しょうめい"],["象","象","ぞう"],["賞","賞品","しょうひん"],["条","条件","じょうけん"],["状","年賀状","ねんがじょう"],["常","日常","にちじょう"],["情","友情","ゆうじょう"],["織","織る","おる"],["職","職業","しょくぎょう"],["制","制服","せいふく"],["性","性格","せいかく"],["政","政治","せいじ"],["勢","大勢","おおぜい"],["精","精神","せいしん"],["製","製品","せいひん"],["税","税金","ぜいきん"],["責","責める","せめる"],["績","成績","せいせき"],["接","直接","ちょくせつ"],["設","建設","けんせつ"],["絶","絶対","ぜったい"],["祖","祖父","そふ"],["素","素直","すなお"],["総","総合","そうごう"],["造","造る","つくる"],["像","想像","そうぞう"],["増","増える","ふえる"],["則","規則","きそく"],["測","測る","はかる"],["属","金属","きんぞく"],["率","百分率","ひゃくぶんりつ"],["損","損","そん"],["貸","貸す","かす"],["態","態度","たいど"],["団","団体","だんたい"],["断","断る","ことわる"],["築","建築","けんちく"],["貯","貯金","ちょきん"],["張","張る","はる"],["停","停電","ていでん"],["提","提出","ていしゅつ"],["程","程度","ていど"],["適","適当","てきとう"],["統","伝統","でんとう"],["堂","食堂","しょくどう"],["銅","銅メダル","どうメダル"],["導","指導","しどう"],["得","得意","とくい"],["毒","消毒","しょうどく"],["独","独立","どくりつ"],["任","責任","せきにん"],["燃","燃える","もえる"],["能","能力","のうりょく"],["破","破る","やぶる"],["犯","犯人","はんにん"],["判","判断","はんだん"],["版","出版","しゅっぱん"],["比","比べる","くらべる"],["肥","肥料","ひりょう"],["非","非常口","ひじょうぐち"],["費","費用","ひよう"],["備","備える","そなえる"],["評","評判","ひょうばん"],["貧","貧しい","まずしい"],["布","布","ぬの"],["婦","夫婦","ふうふ"],["武","武士","ぶし"],["復","回復","かいふく"],["複","複数","ふくすう"],["仏","大仏","だいぶつ"],["粉","小麦粉","こむぎこ"],["編","編む","あむ"],["弁","弁当","べんとう"],["保","保健","ほけん"],["墓","お墓","おはか"],["報","天気予報","てんきよほう"],["豊","豊か","ゆたか"],["防","防ぐ","ふせぐ"],["貿","貿易","ぼうえき"],["暴","暴れる","あばれる"],["脈","山脈","さんみゃく"],["務","務める","つとめる"],["夢","夢","ゆめ"],["迷","迷う","まよう"],["綿","綿","わた"],["輸","輸入","ゆにゅう"],["余","余る","あまる"],["容","内容","ないよう"],["略","省略","しょうりゃく"],["留","留守","るす"],["領","領土","りょうど"],["歴","歴史","れきし"]],"6":[["胃","胃薬","いぐすり"],["異","異常","いじょう"],["遺","遺産","いさん"],["域","地域","ちいき"],["宇","宇宙","うちゅう"],["映","映画","えいが"],["延","延長","えんちょう"],["沿","沿岸","えんがん"],["恩","恩人","おんじん"],["我","我が家","わがや"],["灰","灰色","はいいろ"],["拡","拡大","かくだい"],["革","改革","かいかく"],["閣","内閣","ないかく"],["割","役割","やくわり"],["株","株","かぶ"],["干","干す","ほす"],["巻","巻く","まく"],["看","看護","かんご"],["簡","簡単","かんたん"],["危","危ない","あぶない"],["机","机","つくえ"],["揮","指揮","しき"],["貴","貴重","きちょう"],["疑","疑う","うたがう"],["吸","吸う","すう"],["供","子供","こども"],["胸","胸","むね"],["郷","故郷","こきょう"],["勤","勤める","つとめる"],["筋","筋肉","きんにく"],["系","太陽系","たいようけい"],["敬","敬語","けいご"],["警","警察","けいさつ"],["劇","劇","げき"],["激","激しい","はげしい"],["穴","落とし穴","おとしあな"],["券","乗車券","じょうしゃけん"],["絹","絹","きぬ"],["権","権利","けんり"],["憲","憲法","けんぽう"],["源","資源","しげん"],["厳","厳しい","きびしい"],["己","自己","じこ"],["呼","呼ぶ","よぶ"],["誤","誤解","ごかい"],["后","皇后","こうごう"],["孝","親孝行","おやこうこう"],["皇","天皇","てんのう"],["紅","紅茶","こうちゃ"],["降","降る","ふる"],["鋼","鉄鋼","てっこう"],["刻","刻む","きざむ"],["穀","穀物","こくもつ"],["骨","骨","ほね"],["困","困る","こまる"],["砂","砂場","すなば"],["座","座席","ざせき"],["済","済む","すむ"],["裁","裁判","さいばん"],["策","対策","たいさく"],["冊","一冊","いっさつ"],["蚕","蚕","かいこ"],["至","夏至","げし"],["私","私","わたし"],["姿","姿","すがた"],["視","視力","しりょく"],["詞","歌詞","かし"],["誌","雑誌","ざっし"],["磁","磁石","じしゃく"],["射","注射","ちゅうしゃ"],["捨","捨てる","すてる"],["尺","縮尺","しゅくしゃく"],["若","若者","わかもの"],["樹","樹木","じゅもく"],["収","収入","しゅうにゅう"],["宗","宗教","しゅうきょう"],["就","就職","しゅうしょく"],["衆","観衆","かんしゅう"],["従","従う","したがう"],["縦","縦書き","たてがき"],["縮","縮む","ちぢむ"],["熟","熟語","じゅくご"],["純","単純","たんじゅん"],["処","処理","しょり"],["署","署名","しょめい"],["諸","諸国","しょこく"],["除","除く","のぞく"],["承","承知","しょうち"],["将","将来","しょうらい"],["傷","傷","きず"],["障","故障","こしょう"],["蒸","蒸気","じょうき"],["針","針","はり"],["仁","仁王","におう"],["垂","垂れる","たれる"],["推","推理","すいり"],["寸","寸法","すんぽう"],["盛","大盛り","おおもり"],["聖","聖火","せいか"],["誠","誠実","せいじつ"],["舌","舌","した"],["宣","宣言","せんげん"],["専","専門","せんもん"],["泉","泉","いずみ"],["洗","洗う","あらう"],["染","染める","そめる"],["銭","銭湯","せんとう"],["善","改善","かいぜん"],["奏","演奏","えんそう"],["窓","窓","まど"],["創","創作","そうさく"],["装","服装","ふくそう"],["層","地層","ちそう"],["操","体操","たいそう"],["蔵","冷蔵庫","れいぞうこ"],["臓","心臓","しんぞう"],["存","保存","ほぞん"],["尊","尊敬","そんけい"],["退","退場","たいじょう"],["宅","自宅","じたく"],["担","担任","たんにん"],["探","探す","さがす"],["誕","誕生日","たんじょうび"],["段","階段","かいだん"],["暖","暖かい","あたたかい"],["値","値段","ねだん"],["宙","宙返り","ちゅうがえり"],["忠","忠実","ちゅうじつ"],["著","著者","ちょしゃ"],["庁","県庁","けんちょう"],["頂","頂上","ちょうじょう"],["腸","胃腸","いちょう"],["潮","満潮","まんちょう"],["賃","運賃","うんちん"],["痛","痛い","いたい"],["敵","敵","てき"],["展","発展","はってん"],["討","検討","けんとう"],["党","政党","せいとう"],["糖","砂糖","さとう"],["届","届く","とどく"],["難","難しい","むずかしい"],["乳","牛乳","ぎゅうにゅう"],["認","認める","みとめる"],["納","納得","なっとく"],["脳","頭脳","ずのう"],["派","派手","はで"],["拝","拝む","おがむ"],["背","背中","せなか"],["肺","肺活量","はいかつりょう"],["俳","俳句","はいく"],["班","班長","はんちょう"],["晩","今晩","こんばん"],["否","否定","ひてい"],["批","批判","ひはん"],["秘","神秘","しんぴ"],["俵","土俵","どひょう"],["腹","腹","はら"],["奮","興奮","こうふん"],["並","並ぶ","ならぶ"],["陛","陛下","へいか"],["閉","閉じる","とじる"],["片","片道","かたみち"],["補","補う","おぎなう"],["暮","夕暮れ","ゆうぐれ"],["宝","宝物","たからもの"],["訪","訪ねる","たずねる"],["亡","死亡","しぼう"],["忘","忘れる","わすれる"],["棒","鉄棒","てつぼう"],["枚","枚数","まいすう"],["幕","開幕","かいまく"],["密","秘密","ひみつ"],["盟","同盟","どうめい"],["模","模型","もけい"],["訳","通訳","つうやく"],["郵","郵便","ゆうびん"],["優","優しい","やさしい"],["預","預ける","あずける"],["幼","幼い","おさない"],["欲","意欲","いよく"],["翌","翌日","よくじつ"],["乱","乱れる","みだれる"],["卵","卵","たまご"],["覧","展覧会","てんらんかい"],["裏","裏","うら"],["律","法律","ほうりつ"],["臨","臨時","りんじ"],["朗","朗読","ろうどく"],["論","結論","けつろん"]]};
+const NUM = ["","一","二","三","四","五","六"];
+const TERM_NAME3 = {0:"1年間",1:"1学期",2:"2学期",3:"3学期"};
+const TERM_NAME2 = {0:"1年間",1:"前期",2:"後期",3:""};
+const TERM_NAME = new Proxy({}, {get:(o,k) => (state.tsys === "2" ? TERM_NAME2 : TERM_NAME3)[k]});
+function tName(t){ return TERM_NAME[String(t)]; }
+function termIds(){ return state.tsys === "2" ? [1,2] : [1,2,3]; }
+const TERM_KAN = {0:"一年間",1:"一学期",2:"二学期",3:"三学期"};
+const GRADE_OF = {}, WORD = {}, NUMBER = {};
+for (let g=1; g<=6; g++){ [...KANJI[g]].forEach((c,i)=>{ GRADE_OF[c]=g; NUMBER[c]=i+1; }); JUKU[g].forEach(([t,w,y])=>{ WORD[t]={w,y}; }); }
+
+const state = {tsrc:"grade", ctext:"運動会 うんどうかい\n【泳】ぐ およぐ\n駅前 えきまえ", ctitle:"漢字テスト", tsys:"3", ofrom:"word", otext:"学校 がっこう\n休む やすむ\n大きい おおきい\n赤ちゃん あかちゃん\n友だち ともだち", otitle:"お手本", orows:10, ocols:5, oruby:true, ocolor:"black", onewcol:false, orepeat:false, ofill:true, orepLight:false, okana2:false, ogrid:"10x5", grade:1, term:"0", mode:"test", qn:"10", limit:"all", pword:true, write:"all", ans:"each", size:"M", order:"list", trace:true, cross:true, page:0};
+let shuffleSeed = 1;
+const FONT = '"Klee One","Hiragino Mincho ProN","Yu Mincho",serif';
+const SANS = '"BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif';
+const W = 297, H = 210, M = 10;
+const STRIP_W = 22, STRIP_X = W - M - STRIP_W;
+const SIZES = {L:{s:24,gap:2}, M:{s:20,gap:1.6}, S:{s:16,gap:1.4}};
+const RED = "#c62828";
+
+const APP_VERSION = "1.0.0";
+let downloads = null;
+(async () => { try { if (window.claude && claude.use) downloads = await claude.use("downloads"); } catch(e){} })();
+const $ = id => document.getElementById(id);
+
+// ---------- 学期の分け方 ----------
+const store = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+function defaultTerms(g){ return ["","",""]; }
+function cleanFor(g, text){   // 学期の字：その学年の字だけ
+  const seen = new Set(), out = [];
+  for (const c of text){ if (GRADE_OF[c]===g && !seen.has(c)){ seen.add(c); out.push(c); } }
+  return out;
+}
+function termKey(g){ return (state.tsys === "2" ? "kanjiTerms2:v1:" : "kanjiTerms:v1:") + g; }
+const termCache = {};
+function terms(g){
+  const ck = state.tsys + ":" + g;
+  if (termCache[ck]) return termCache[ck];
+  let raw = null;
+  try { raw = JSON.parse(store.get(termKey(g))); } catch(e){}
+  if (!Array.isArray(raw) || raw.length!==3) raw = defaultTerms(g);
+  const lists = raw.map((t,i) => (state.tsys === "2" && i === 2) ? [] : cleanFor(g, t));   // 同じ字がちがう学期に重なってもよい
+  const termOf = {}; lists.forEach((l,i)=>l.forEach(c=>{ if (!termOf[c]) termOf[c]=i+1; }));
+  const missing = [...KANJI[g]].filter(c=>!termOf[c]);
+  return termCache[ck] = {lists, termOf, missing, custom: lists.some(l=>l.length)};
+}
+function saveTerms(g, texts){
+  store.set(termKey(g), JSON.stringify(texts));
+  delete termCache[state.tsys + ":" + g];
+}
+
+// 書けるはずの字か（その学年・学期までにならった字）
+function learned(c){
+  const g = GRADE_OF[c];
+  if (!g) return false;
+  if (g < state.grade) return true;
+  if (g > state.grade) return false;
+  if (state.term === "0") return true;
+  const t = terms(g).termOf[c];
+  return !!t && t <= Number(state.term);
+}
+
+// ---------- 自分で入力した問題 ----------
+// 1行に1問「ことば よみ」。【】でかこんだ字だけを書かせる（かこみがなければ漢字ぜんぶ）
+function parseCustom(){
+  const out = [];
+  String(state.ctext || "").split(/\r?\n/).forEach(line => {
+    line = line.trim(); if (!line) return;
+    const m = line.match(/^(\S+?)(?:[\s　:：、,，（(]+(.*))?$/);
+    let raw = m ? m[1] : line.replace(/[\s　]+/g, "");
+    let y = m && m[2] ? m[2].replace(/[^ぁ-ゖァ-ヺー]/g, "") : "";
+    const blanks = new Set(); let w = "", inB = false, marked = false;
+    for (const c of raw){
+      if (c === "【" || c === "［" || c === "[" || c === "〔"){ inB = true; marked = true; continue; }
+      if (c === "】" || c === "］" || c === "]" || c === "〕"){ inB = false; continue; }
+      if (inB && isKanji(c)) blanks.add([...w].length);
+      w += c;
+    }
+    if (!w || ![...w].some(isKanji)) return;
+    if (!marked) [...w].forEach((c,i) => { if (isKanji(c)) blanks.add(i); });
+    if (!y && typeof READ_DICT !== "undefined" && READ_DICT[w]) y = READ_DICT[w];
+    const first = [...w].find((c,i) => blanks.has(i)) || [...w].find(isKanji);
+    out.push({c: first, n: out.length + 1, cw: {w, y, blanks}});
+  });
+  return out;
+}
+function isCustom(){ return state.mode === "test" && state.tsrc === "custom"; }
+// ---------- 出題する字 ----------
+function pool(){
+  if (isCustom()){
+    let arr = parseCustom();
+    if (state.order === "shuffle"){
+      let s = shuffleSeed * 9301 + 777;
+      const rnd = () => (s = (s*9301 + 49297) % 233280) / 233280;
+      for (let i=arr.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+    }
+    if (state.limit !== "all") arr = arr.slice(0, Number(state.limit));
+    return arr;
+  }
+  const g = state.grade;
+  let arr = state.term === "0" ? [...KANJI[g]] : terms(g).lists[Number(state.term)-1].slice();
+  if (state.order === "shuffle"){
+    let s = shuffleSeed * 9301 + g*49297 + Number(state.term)*233;
+    const rnd = () => (s = (s*9301 + 49297) % 233280) / 233280;
+    for (let i=arr.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  }
+  if (state.limit !== "all") arr = arr.slice(0, Number(state.limit));
+  return arr.map(c => ({c, n:NUMBER[c]}));
+}
+
+// ---------- ページ構成 ----------
+function practiceLayout(){
+  if (state.mode === "check"){
+    const cw = 17, boxS = 13, ch = 21, top = 12, avail = (W - M - STRIP_W - 3) - M;
+    const cols = Math.floor(avail / cw), rows = Math.floor((H - M - top) / ch);
+    return {kind:"check", cw, boxS, ch, top, cols, rows, per: cols*rows};
+  }
+  const {s, gap} = SIZES[state.size], top = 16;
+  const rows = Math.floor((H - M - top) / s), avail = (STRIP_X - 2) - M;
+  const cols = Math.floor((avail + gap) / (s + gap));
+  const wordRows = state.pword ? (state.size === "S" ? 3 : 2) : 0;
+  return {kind:"practice", s, gap, top, rows, cols, per: cols, wordRows, boxRows: rows - wordRows};
+}
+function perPage(){ return state.mode === "test" ? Number(state.qn) : practiceLayout().per; }
+function pages(){
+  if (state.mode === "otehon") return otehonPages();
+  const items = pool(), per = perPage(), out = [];
+  const chunks = [];
+  for (let i=0;i<Math.max(1,items.length);i+=per) chunks.push(items.slice(i,i+per));
+  if (state.mode !== "test" || state.ans === "none"){ chunks.forEach((c,i)=>out.push({items:c, idx:i, total:chunks.length, answer:false})); }
+  else if (state.ans === "each"){ chunks.forEach((c,i)=>{ out.push({items:c, idx:i, total:chunks.length, answer:false}); out.push({items:c, idx:i, total:chunks.length, answer:true}); }); }
+  else { chunks.forEach((c,i)=>out.push({items:c, idx:i, total:chunks.length, answer:false})); chunks.forEach((c,i)=>out.push({items:c, idx:i, total:chunks.length, answer:true})); }
+  return out;
+}
+
+// ---------- 描画（単位 mm） ----------
+function centerText(ctx, ch, cx, cy, size, color, font, weight){
+  ctx.font = `${weight||600} ${size}px ${font||FONT}`;
+  ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+  const m = ctx.measureText(ch);
+  const asc = m.actualBoundingBoxAscent || size*0.8, desc = m.actualBoundingBoxDescent || size*0.1;
+  ctx.fillText(ch, cx, cy + (asc - desc)/2);
+}
+function box(ctx, x, y, s, lw){
+  if (state.cross){
+    ctx.save(); ctx.strokeStyle = "#bcc4cb"; ctx.lineWidth = 0.18; ctx.setLineDash([0.9,0.9]);
+    ctx.beginPath(); ctx.moveTo(x+s/2, y+0.4); ctx.lineTo(x+s/2, y+s-0.4);
+    ctx.moveTo(x+0.4, y+s/2); ctx.lineTo(x+s-0.4, y+s/2); ctx.stroke(); ctx.restore();
+  }
+  ctx.strokeStyle = "#2f3539"; ctx.lineWidth = lw || 0.32; ctx.strokeRect(x, y, s, s);
+}
+const SMALL = "ぁぃぅぇぉっゃゅょゎ";
+function vText(ctx, text, cx, y, size, color, step){
+  ctx.font = `600 ${size}px ${FONT}`; ctx.fillStyle = color; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  step = step || size*1.08;
+  let yy = y + step/2;
+  for (const ch of text){
+    if (ch === " " || ch === "　"){ yy += step*0.6; continue; }
+    if (SMALL.includes(ch)) ctx.fillText(ch, cx + size*0.14, yy - size*0.14);
+    else ctx.fillText(ch, cx, yy);
+    yy += step;
+  }
+  return yy;
+}
+function strip(ctx, pg){
+  const cx = STRIP_X + STRIP_W/2;
+  ctx.font = `400 3.1px ${SANS}`; ctx.fillStyle = "#555"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  if (state.mode === "otehon"){
+    ctx.fillText(`${pg.idx+1} / ${pg.total}`, cx, M + 2);
+    const t = [...(state.otitle || "お手本").replace(/\s+/g,"")].slice(0, 12).join("");
+    vText(ctx, t, cx, M + 6, Math.min(6.2, 92/Math.max(1,[...t].length)/1.08), "#1d2328");
+  } else {
+  if (isCustom()){
+    ctx.fillText(`${pg.idx+1} / ${pg.total}`, cx, M + 2);
+    const t = [...(state.ctitle || "漢字テスト").replace(/\s+/g,"")].slice(0, 10).join("");
+    vText(ctx, t, cx, M + 6, Math.min(6.2, 66/Math.max(1,[...t].length)/1.08), "#1d2328");
+  } else {
+  ctx.fillText(`${TERM_NAME[state.term]}　${pg.idx+1} / ${pg.total}`, cx, M + 2);
+  const name = state.mode==="test" ? "漢字テスト" : state.mode==="check" ? "漢字かくにん表" : "漢字ふくしゅう";
+  vText(ctx, NUM[state.grade] + "年　" + name, cx, M + 6, 6.2, "#1d2328");
+  }
+  }
+  if (state.mode === "test"){
+    if (pg.answer){
+      vText(ctx, "こたえ", cx, 82, 6.2, RED);
+    } else {
+      const bx = STRIP_X + 3, by = 84, bw = STRIP_W - 6, bh = 20;
+      ctx.strokeStyle = "#2f3539"; ctx.lineWidth = 0.32; ctx.strokeRect(bx, by, bw, bh);
+      ctx.font = `600 3.6px ${FONT}`; ctx.fillStyle = "#1d2328"; ctx.textAlign = "right"; ctx.textBaseline = "alphabetic";
+      ctx.fillText("点", bx + bw - 1, by + bh - 1.2);
+    }
+  }
+  const nameTop = 110;
+  vText(ctx, "なまえ", cx, nameTop, 4.6, "#1d2328");
+  const bx = STRIP_X + 3, by = nameTop + 17;
+  ctx.strokeStyle = "#2f3539"; ctx.lineWidth = 0.32; ctx.strokeRect(bx, by, STRIP_W - 6, H - M - by);
+  ctx.strokeStyle = "#9aa3aa"; ctx.lineWidth = 0.2;
+  ctx.beginPath(); ctx.moveTo(STRIP_X - 1, M); ctx.lineTo(STRIP_X - 1, H - M); ctx.stroke();
+}
+function isKanji(c){ return c >= "\u4e00" && c <= "\u9fff"; }
+
+// ことばの読みを、漢字のまとまりごとに分ける（送り仮名の読みは除く）
+const readingCache = {};
+function splitReading(w, y){
+  const key = w + "|" + y; if (readingCache[key]) return readingCache[key];
+  const runs = [], pat = [];
+  let buf = "", kanji = null;
+  for (const c of w){
+    const k = isKanji(c);
+    if (kanji === null || k === kanji) buf += c; else { pat.push({k:kanji, t:buf}); buf = c; }
+    kanji = k;
+  }
+  if (buf) pat.push({k:kanji, t:buf});
+  const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp("^" + pat.map(p => p.k ? "(.+?)" : esc(p.t)).join("") + "$");
+  const m = y.match(re);
+  const out = m ? m.slice(1) : [y];
+  return readingCache[key] = out;
+}
+function drawWordItem(ctx, it, o){
+  const word = it.cw || WORD[it.c]; if (!word) return;
+  const chars = [...word.w], kanaK = 0.5;
+  let total = chars.reduce((a,c)=>a + (isKanji(c) ? o.sBase : o.sBase*kanaK), 0);
+  const k = total > o.avail ? o.avail/total : 1;
+  const s = o.sBase * k; total *= k;
+  const groupW = s + 1 + o.readW;
+  const boxX = o.left + (o.width - groupW)/2;
+  let y = o.top + (o.center ? (o.avail - total)/2 : 0), targetUsed = false;
+  const runs = []; let cur = null;
+  chars.forEach((c, ci) => {
+    if (isKanji(c)){
+      if (!cur){ cur = {y0:y, y1:y}; runs.push(cur); }
+      let isTarget = c === it.c && !targetUsed; if (isTarget) targetUsed = true;
+      let blank = o.practice ? isTarget : (isTarget || (state.write === "all" && learned(c)));
+      if (it.cw){ blank = it.cw.blanks.has(ci); isTarget = blank; }
+      box(ctx, boxX, y, s, isTarget ? 0.5 : 0.32);
+      if (!blank) centerText(ctx, c, boxX + s/2, y + s/2, s*0.76, "#1d2328");
+      else if (o.answer) centerText(ctx, c, boxX + s/2, y + s/2, s*0.76, RED);
+      y += s; cur.y1 = y;
+    } else {
+      cur = null;
+      kanaText(ctx, c, boxX + s/2, y + s*kanaK/2, s*0.36, s*kanaK, "#1d2328");
+      y += s*kanaK;
+    }
+  });
+  const parts = word.y ? splitReading(word.w, word.y) : [];
+  // 自分で入力した問題は、熟語のよみを1字ずつに分けて付ける
+  let rr = runs, pp = parts;
+  if (it.cw && parts.length === runs.length){
+    rr = []; pp = [];
+    let ci = 0; const ks = [...word.w].filter(isKanji);
+    runs.forEach((r, ri) => {
+      const n = Math.round((r.y1 - r.y0) / s), kan = ks.slice(ci, ci + n); ci += n;
+      const per = n > 1 && typeof splitPerKanji === "function" ? splitPerKanji(kan, parts[ri]) : null;
+      if (per) per.forEach((x, j) => { rr.push({y0: r.y0 + j*s, y1: r.y0 + (j+1)*s}); pp.push(x); });
+      else { rr.push(r); pp.push(parts[ri]); }
+    });
+  }
+  rr.forEach((r, ri) => {
+    const text = pp[ri] || "";
+    const len = [...text].length; if (!len) return;
+    const span = r.y1 - r.y0;
+    let rs = Math.min(o.readW*0.78, o.rsMax || 5.2);
+    let step = Math.min(rs*1.06, span/len);
+    const minStep = Math.min(3.2, rs*1.06);
+    if (step < minStep) step = minStep;
+    if (step < rs) rs = step/1.02;
+    const ry = r.y0 + (span - step*len)/2;
+    vText(ctx, text, boxX + s + 1 + o.readW/2, ry, rs, "#1d2328", step);
+  });
+}
+function drawTest(ctx, pg){
+  const n = Number(state.qn), bands = n <= 5 ? 1 : 2, cols = n/bands, areaR = STRIP_X - 3, areaL = M;
+  const colW = (areaR - areaL)/cols, bandH = (H - 2*M)/bands;
+  const readW = Math.min(colW*0.24, n <= 5 ? 11 : 11);
+  const sBase = Math.min(colW - readW - 3.5, n <= 5 ? 36 : n === 10 ? 26 : 22);
+  pg.items.forEach((it, i) => {
+    const band = Math.floor(i/cols), col = i % cols;
+    const colRight = areaR - col*colW, top = M + band*bandH;
+    const qNo = pg.idx*n + i + 1;
+    const nx = colRight - colW/2, ny = top + 3.6;
+    ctx.strokeStyle = "#2f3539"; ctx.lineWidth = 0.25; ctx.beginPath(); ctx.arc(nx, ny, 3, 0, Math.PI*2); ctx.stroke();
+    ctx.font = `700 ${qNo>=100?2.4:3.2}px ${SANS}`; ctx.fillStyle = "#1d2328"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(qNo), nx, ny + 0.15);
+    drawWordItem(ctx, it, {left: colRight - colW, width: colW, top: top + (n <= 5 ? 16 : 9.5), avail: bandH - (n <= 5 ? 22 : 13), sBase, readW, answer: pg.answer, center: false, rsMax: n <= 5 ? 7 : 5.2});
+  });
+}
+
+function drawPractice(ctx, pg){
+  const L = practiceLayout();
+  if (L.kind === "practice"){
+    const right = STRIP_X - 2;
+    pg.items.forEach((it, i) => {
+      const x = right - (i+1)*L.s - i*L.gap;
+      ctx.font = `400 3px ${SANS}`; ctx.fillStyle = "#6b747b"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(String(it.n), x + L.s/2, M + 3);
+      for (let r=0; r<L.boxRows; r++){
+        const y = L.top + r*L.s;
+        box(ctx, x, y, L.s);
+        if (r === 0) centerText(ctx, it.c, x+L.s/2, y+L.s/2, L.s*0.78, "#111");
+        else if (r === 1 && state.trace) centerText(ctx, it.c, x+L.s/2, y+L.s/2, L.s*0.78, "#cfd4d8");
+      }
+      ctx.strokeStyle = "#111"; ctx.lineWidth = 0.55; ctx.strokeRect(x, L.top, L.s, L.s);
+      if (L.wordRows){
+        const wTop = L.top + L.boxRows*L.s + 2.5, wH = (H - M) - wTop;
+        ctx.save(); ctx.strokeStyle = "#9aa3aa"; ctx.lineWidth = 0.2; ctx.setLineDash([1.2,1]);
+        ctx.beginPath(); ctx.moveTo(x, wTop - 1.2); ctx.lineTo(x + L.s, wTop - 1.2); ctx.stroke(); ctx.restore();
+        const ws = L.s*0.58, readW = L.s - ws - 1.2;
+        drawWordItem(ctx, it, {left: x, width: L.s, top: wTop, avail: wH, sBase: ws, readW, practice: true, center: true});
+      }
+    });
+  } else {
+    const right = STRIP_X - 3;
+    pg.items.forEach((it, i) => {
+      const col = Math.floor(i / L.rows), row = i % L.rows;
+      const x0 = right - (col+1)*L.cw, y0 = L.top + row*L.ch;
+      const bx = x0 + (L.cw - L.boxS)/2;
+      box(ctx, bx, y0, L.boxS);
+      centerText(ctx, it.c, bx + L.boxS/2, y0 + L.boxS/2, L.boxS*0.8, "#111");
+      const cs = 3.6, cy = y0 + L.boxS + 1.2;
+      ctx.strokeStyle = "#2f3539"; ctx.lineWidth = 0.25; ctx.strokeRect(bx + L.boxS - cs, cy, cs, cs);
+      ctx.font = `400 2.6px ${SANS}`; ctx.fillStyle = "#6b747b"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+      ctx.fillText(String(it.n), bx, cy + cs/2);
+    });
+  }
+}
+function drawPage(ctx, pg){
+  if (pg.otehon){ ctx.fillStyle = "#fff"; ctx.fillRect(0,0,210,297); drawOtehon(ctx, pg); return; }
+  ctx.fillStyle = "#fff"; ctx.fillRect(0,0,W,H);
+  strip(ctx, pg);
+  if (!pg.items.length){
+    ctx.font = `400 6px ${SANS}`; ctx.fillStyle = "#888"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("この学期の漢字がまだ設定されていません", (M + STRIP_X)/2, H/2 - 5);
+    ctx.font = `400 4.2px ${SANS}`; ctx.fillText("プレビューの下の「学期の漢字を設定」から設定してください", (M + STRIP_X)/2, H/2 + 5); return;
+  }
+  if (state.mode === "test") drawTest(ctx, pg); else drawPractice(ctx, pg);
+}
+function pageSize(pg){ return pg && pg.otehon ? {pw:210, ph:297} : {pw:W, ph:H}; }
+function renderTo(canvas, pg, pxPerMm){
+  const {pw, ph} = pageSize(pg);
+  canvas.width = Math.round(pw*pxPerMm); canvas.height = Math.round(ph*pxPerMm);
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(pxPerMm,0,0,pxPerMm,0,0);
+  drawPage(ctx, pg);
+}
+
+async function fontsReady(){
+  const words = JUKU[state.grade].map(x=>x[1]+x[2]).join("");
+  const text = KANJI[state.grade] + words + "一二三四五六年漢字テストふくしゅうかくにん表なまえこたえ点学期間" + (state.ctext||"") + (state.ctitle||"");
+  try {
+    await Promise.race([
+      Promise.all([document.fonts.load(`600 40px "Klee One"`, text), document.fonts.load(`400 20px "BIZ UDPGothic"`, "0123456789/学期年間"), document.fonts.load(`700 20px "BIZ UDPGothic"`, "0123456789")]),
+      new Promise(r => setTimeout(r, 6000))
+    ]);
+  } catch(e){}
+}
+
+
+// ---------- お手本（自由入力） ----------
+function parseOtehon(){
+  const out = [];
+  for (let line of String(state.otext || "").split(/\r?\n/)){
+    line = line.trim(); if (!line) continue;
+    const m = line.match(/^(\S+?)(?:[\s　:：、,，（(]+(.*))?$/);
+    const w = m ? m[1] : line.replace(/[\s　]+/g, "");
+    // よみ：空白・「・」・「/」などで区切ると1字ずつのよみになる
+    const y = m && m[2] ? m[2].replace(/[\s　・･\/／,，、.。|｜-]+/g, "・").replace(/[^ぁ-ゖァ-ヺー・]/g, "").replace(/^・+|・+$/g, "") : "";
+    out.push({w, y});
+  }
+  return out;
+}
+// 漢字帳（A4たて）：1マスの右に読みがな欄、マスは上から下、列は右から左
+const OTE = {x0:15, x1:195, y0:24, y1:282};
+function otehonLayout(){
+  const R = Math.max(3, Math.min(20, Number(state.orows) || 10));
+  const C = Math.max(1, Math.min(12, Number(state.ocols) || 5));
+  const r = state.oruby ? 0.35 : 0;
+  const s = Math.min((OTE.y1 - OTE.y0) / R, (OTE.x1 - OTE.x0) / (C * (1 + r)));
+  return {R, C, r, s, per: R*C};
+}
+// 1字ずつのよみ分け（読みデータ：KANJIDIC © EDRDG, CC BY-SA 4.0 をもとに常用漢字分を抜粋）
+const YOMI = {};
+"一いち,いつ,ひと,ひとつ;二に,じ,ふた,ふたつ,ふたたび;九きゅう,く,ここの,ここのつ;七しち,なな,ななつ,なの;人じん,にん,ひと,り,と;入にゅう,じゅ,い,いる,いり,いれる,いれ,はい,はいる;八はち,や,やつ,やっ,やっつ,よう;力りょく,りき,りい,ちから;十じゅう,じっ,じゅっ,とお,と;三さん,ぞう,み,みつ,みっ,みっつ;上じょう,しょう,しゃん,うえ,うわ,かみ,あ,あげる,あがる,あがり,のぼ,のぼる,のぼり,のぼせる,のぼす,たてまつ,たてまつる;下か,げ,した,しも,もと,さ,さげる,さがる,くだ,くだる,くだり,くだす,くださる,お,おろす,おりる;口こう,く,くち;大だい,たい,おお,おおきい,おおいに;女じょ,にょ,にょう,おんな,め;山さん,せん,やま;川せん,かわ;工こう,く,ぐ;刀とう,かたな,そり;土ど,と,つち;千せん,ち;夕せき,ゆう;子し,す,つ,こ,ね;小しょう,ちい,ちいさい,こ,お,さ;丁ちょう,てい,ちん,とう,ち,ひのと;了りょう;又ゆう,また,またの;丸がん,まる,まるめる,まるい;才さい;中ちゅう,なか,うち,あた,あたる;五ご,いつ,いつつ;六ろく,りく,む,むつ,むっ,むっつ,むい;円えん,まる,まるい,まど,まどか,まろ,まろやか;天てん,あまつ,あめ,あま;手しゅ,ず,て,た;文ぶん,もん,ふみ,あや;日にち,じつ,ひ,び,か;月げつ,がつ,つき;木ぼく,もく,き,こ;水すい,みず;火か,ひ,び,ほ;犬けん,いぬ;王おう,のう;出しゅつ,すい,で,でる,だ,だす,い,いでる,いだす;右う,ゆう,みぎ;四し,よ,よつ,よっ,よっつ,よん;左さ,しゃ,ひだり;本ほん,もと;正せい,しょう,ただ,ただしい,ただす,まさ,まさに;玉ぎょく,たま,だま;田でん,た;白はく,びゃく,しろ,しら,しろい;目もく,ぼく,め,ま;石せき,しゃく,こく,いし;立りつ,りゅう,りっとる,た,たつ,たち,たてる,たて,だ,だて,だてる;万まん,ばん,よろず;久きゅう,く,ひさ,ひさしい;今こん,きん,いま;元げん,がん,もと;公こう,く,おおやけ;内ない,だい,うち;分ぶん,ふん,ぶ,わ,わける,わけ,わかれる,わかる,わかつ;切せつ,さい,き,きる,きり,ぎ,ぎり,きれる,きれ,ぎれ;午ご,うま;友ゆう,とも;太たい,た,ふと,ふとい,ふとる;少しょう,すく,すくない,すこ,すこし;引いん,ひ,ひく,ひき,び,びき,ひける;心しん,こころ,ごころ;戸こ,と;方ほう,かた,がた;牛ぎゅう,うし;父ふ,ちち;毛もう,け;止し,と,とまる,ど,どまり,とめる,どめ,とど,とどめる,とどめ,とどまる,や,やめる,やむ,よ,よす,さ,さす,さし;兄けい,きょう,あに;冬とう,ふゆ;北ほく,きた;半はん,なか,なかば;古こ,ふる,ふるい,ふるす;台だい,たい,うてな,われ,つかさ;外がい,げ,そと,ほか,はず,はずす,はずれる,と;市し,いち;広こう,ひろ,ひろい,ひろまる,ひろめる,ひろがる,ひろげる;母ぼ,はは,も;用よう,もち,もちいる;矢し,や;世せい,せ,そう,よ;主しゅ,す,しゅう,ぬし,おも,あるじ;他た,ほか;代だい,たい,か,かわる,かわ,かわり,がわ,がわり,が,かえる,よ,しろ;写しゃ,じゃ,うつ,うつす,うつる,うつし;去きょ,こ,さ,さる;号ごう,さけ,さけぶ,よびな;央おう;平へい,びょう,ひょう,たい,たいら,だいら,ひら;打だ,だあす,う,うつ,うち,ぶ,ぶつ;氷ひょう,こおり,ひ,こお,こおる;申しん,もう,もうす,もうし,さる;皮ひ,かわ;皿べい,さら;礼れい,らい;休きゅう,やす,やすむ,やすまる,やすめる;先せん,さき,ま,まず;名めい,みょう,な;字じ,あざ,あざな,な;年ねん,とし;早そう,さっ,はや,はやい,はやまる,はやめる,さ;気き,け,いき;百ひゃく,びゃく,もも;竹ちく,たけ;糸し,いと;耳じ,みみ;虫ちゅう,き,むし;村そん,むら;男だん,なん,おとこ,お;町ちょう,まち;花か,け,はな;見けん,み,みる,みえる,みせる;貝ばい,かい;赤せき,しゃく,あか,あかい,あからむ,あからめる;足そく,あし,た,たりる,たる,たす;車しゃ,くるま;不ふ,ぶ;仕し,じ,つか,つかえる;交こう,まじ,まじわる,まじえる,ま,まじる,まざる,まぜる,か,かう,かわす,かわ,こもごも;会かい,え,あ,あう,あわせる,あつ,あつまる;光こう,ひか,ひかる,ひかり;同どう,おな,おなじ;回かい,え,まわ,まわる,まわり,まわす,まわし,もとお,もとおる,か,かえる;多た,おお,おおい,まさ,まさに,まさる;当とう,あ,あたる,あたり,あてる,あて,まさ,まさに,まさにべし;毎まい,ごと,ごとに;池ち,いけ;米べい,まい,めえとる,こめ,よね;羽う,は,わ,はね;考こう,かんが,かんがえる,かんがえ;肉にく,しし;自じ,し,みずか,みずから,おの,おのずから,おのずと;色しょく,しき,いろ;行こう,ぎょう,あん,い,いく,ゆ,ゆく,ゆき,いき,おこな,おこなう,おこ;西せい,さい,す,にし;何か,なに,なん;体たい,てい,からだ,かたち;作さく,さ,つく,つくる,つくり,づく,づくり;図ず,と,え,はか,はかる;声せい,しょう,こえ,こわ;売ばい,う,うる,うれる;弟てい,だい,で,おとうと;形けい,ぎょう,かた,がた,かたち,なり;来らい,たい,く,くる,きた,きたる,きたす,き,こ;社しゃ,やしろ;角かく,かど,つの;言げん,ごん,い,いう,こと;谷こく,たに,きわ,きわまる;走そう,はし,はしる;近きん,こん,ちか,ちかい;里り,さと;麦ばく,むぎ;学がく,まな,まなぶ;林りん,はやし;空くう,そら,あ,あく,あき,あける,から,す,すく,すかす,むな,むなしい;金きん,こん,ごん,かね,かな,がね;雨う,あめ,あま,さめ;青せい,しょう,あお,あおい;草そう,くさ,ぐさ;音おん,いん,のん,おと,ね;化か,け,ば,ばける,ばかす,ふ,ふける,けする;地ち,じ;両りょう,てる,ふたつ;全ぜん,まった,まったく,すべ,すべて;向こう,む,むく,むい,むき,むける,むけ,むかう,むかい,むこう,むこ,むか;安あん,やす,やすい,やすまる,やすらか;州しゅう,す;曲きょく,ま,まがる,まげる,くま;有ゆう,う,あ,ある;次じ,し,つ,つぐ,つぎ;死し,しぬ,しに;羊よう,ひつじ;血けつ,ち;京きょう,けい,きん,みやこ;国こく,くに;夜や,よ,よる;妹まい,いもうと;姉し,あね,はは;店てん,みせ,たな;明めい,みょう,みん,あ,あかり,あか,あかるい,あかるむ,あからむ,あき,あきらか,あける,あけ,あく,あくる,あかす;東とう,ひがし;歩ほ,ぶ,ふ,ある,あるく,あゆ,あゆむ;画が,かく,え,かい,えが,えがく,かくする,かぎ,かぎる,はかりごと,はか,はかる;直ちょく,じき,じか,ただ,ただちに,なお,なおす,なおる,なおき,す,すぐ;知ち,し,しる,しらせる;長ちょう,なが,ながい,おさ;前ぜん,まえ;南なん,な,みなみ;室しつ,むろ;後ご,こう,のち,うし,うしろ,あと,おく,おくれる;思し,おも,おもう,おもえら,おもえらく,おぼ,おぼす;星せい,しょう,ほし,ぼし;活かつ,い,いきる,いかす,いける;海かい,うみ;点てん,つ,つける,つく,た,たてる,さ,さす,とぼ,とぼす,とも,ともす,ぼち;科か;茶ちゃ,さ;食しょく,じき,く,くう,くらう,た,たべる,は,はむ;首しゅ,くび;欠けつ,けん,か,かける,かく;氏し,うじ;由ゆ,ゆう,ゆい,よし,よ,よる;札さつ,ふだ;民みん,たみ;辺へん,あた,あたり,ほと,ほとり,べ;付ふ,つ,つける,づ,づける,つけ,づけ,つく,づく,つき,づき;以い,もっ,もって;失しつ,うしな,うしなう,う,うせる;必ひつ,かなら,かならず;未み,び,いま,いまだ,ま,まだ,ひつじ;末まつ,ばつ,すえ;校こう,きょう;夏か,が,げ,なつ;家か,け,いえ,や,うち;弱じゃく,よわ,よわい,よわる,よわまる,よわめる;時じ,とき,どき;紙し,かみ;記き,しる,しるす;通つう,つ,とお,とおる,とおり,どお,どおり,とおす,とおし,どおし,かよ,かよう;高こう,たか,たかい,だか,たかまる,たかめる;強きょう,ごう,つよ,つよい,つよまる,つよめる,し,しいる,こわ,こわい;教きょう,おし,おしえる,おそ,おそわる;理り,ことわり;組そ,く,くむ,くみ,ぐみ;船せん,ふね,ふな;週しゅう;雪せつ,ゆき;魚ぎょ,うお,さかな,ざかな;鳥ちょう,とり;黄こう,おう,き,こ;黒こく,くろ,くろずむ,くろい;支し,ささ,ささえる,つか,つかえる,か,かう;住じゅう,ぢゅう,ちゅう,す,すむ,すまう,ず,ずまい;助じょ,たす,たすける,たすかる,す,すける,すけ;医い,いやす,いする,くすし;君くん,きみ,ぎみ;対たい,つい,あいて,こた,こたえる,そろ,そろい,つれあ,つれあい,なら,ならぶ,むか,むかう;局きょく,つぼね;役やく,えき;投とう,な,なげる,なげ;決けつ,き,きめる,ぎ,ぎめ,きまる,さ,さく;究きゅう,く,きわ,きわめる;身しん,み;者しゃ,もの;研けん,と,とぐ;馬ば,うま,ま;森しん,もり;場じょう,ちょう,ば;朝ちょう,あさ;番ばん,つが,つがい;答とう,こた,こたえる,こたえ;絵かい,え;買ばい,か,かう;道どう,とう,みち,いう;間かん,けん,あいだ,ま,あい;雲うん,くも,ぐも;数すう,す,さく,そく,しゅ,かず,かぞ,かぞえる,しばしば,せ,せめる,わずらわ,わずらわしい;楽がく,らく,ごう,たの,たのしい,たのしむ,この,このむ;話わ,はな,はなす,はなし;電でん;所しょ,ところ,どころ,とこ;事じ,ず,こと,つか,つかう,つかえる;使し,つか,つかう,つかい,づか,づかい;具ぐ,そな,そなえる,つぶさ,つぶさに;受じゅ,う,うける,うけ,うかる;和わ,お,か,やわ,やわらぐ,やわらげる,なご,なごむ,なごやか,あ,あえる;始し,はじ,はじめる,はじまる;定てい,じょう,さだ,さだめる,さだまる,さだか;実じつ,しつ,み,みの,みのる,まこと,みち,みちる;服ふく;泳えい,およ,およぐ;物ぶつ,もつ,もの;苦く,くる,くるしい,ぐる,ぐるしい,くるしむ,くるしめる,にが,にがい,にがる;表ひょう,おもて,あらわ,あらわす,あらわれる,あら;部ぶ,べ;乗じょう,しょう,の,のる,のり,のせる;客きゃく,かく;屋おく,や;度ど,と,たく,たび,た,たい;待たい,ま,まつ,まち;持じ,も,もつ,もち,もてる;界かい;発はつ,ほつ,た,たつ,あば,あばく,おこ,おこる,つか,つかわす,はな,はなつ;相そう,しょう,あい;県けん,か,かける;美び,み,うつく,うつくしい;負ふ,ま,まける,まかす,お,おう;送そう,おく,おくる;重じゅう,ちょう,え,おも,おもい,おもり,おもなう,かさ,かさねる,かさなる;談だん;要よう,い,いる,かなめ;勝しょう,か,かつ,が,がち,まさ,まさる,すぐ,すぐれる;仮か,け,かり;起き,お,おきる,おこる,おこす,おこ,た,たつ;速そく,はや,はやい,はやめる,すみ,すみやか;配はい,くば,くばる;酒しゅ,さけ,さか;院いん;終しゅう,お,おわる,おわ,おえる,つい,ついに;習しゅう,じゅ,なら,ならう,ならい;転てん,ころ,ころがる,ころげる,ころがす,ころぶ,まろ,まろぶ,うたた,うつ,うつる,くる,くるめく;進しん,すす,すすむ,すすめる;落らく,お,おちる,おち,おとす;葉よう,は;軽けい,きょう,きん,かる,かるい,かろ,かろやか,かろんじる;運うん,はこ,はこぶ;開かい,ひら,ひらく,ひらき,びら,びらき,ひらける,あ,あく,あける;集しゅう,あつ,あつまる,あつめる,つど,つどう;飲いん,おん,の,のむ,のみ;業ぎょう,ごう,わざ;漢かん;路ろ,る,じ,みち;農のう;鉄てつ,くろがね;歌か,うた,うたう;算さん,そろ;聞ぶん,もん,き,きく,きこえる;語ご,かた,かたる,かたらう;読どく,とく,とう,よ,よむ,よみ;鳴めい,な,なく,なる,ならす;線せん,すじ;横おう,よこ;調ちょう,しら,しらべる,しらべ,ととの,ととのう,ととのえる;親しん,おや,した,したしい,したしむ;頭とう,ず,と,あたま,かしら,がしら,かぶり;顔がん,かお;病びょう,へい,や,やむ,やみ,やまい;最さい,しゅ,もっと,もっとも,つま;争そう,あらそ,あらそう,いか,いかでか;仲ちゅう,なか;伝でん,てん,つた,つたわる,つたえる,つたう,つだ,つだう,づた,づたい,つて;共きょう,とも,ともに,ども;好こう,この,このむ,す,すく,よ,よい,い,いい;成せい,じょう,な,なる,なす;老ろう,お,おいる,ふ,ふける;位い,くらい,ぐらい;低てい,ひく,ひくい,ひくめる,ひくまる;初しょ,はじ,はじめ,はじめて,はつ,うい,そ,そめる,ぞ,ぞめ;別べつ,わか,わかれる,わ,わける;利り,き,きく;努ど,つと,つとめる;労ろう,ろうする,いたわ,いたわる,いた,いたずき,ねぎら,つか,つかれる,ねぎらう;命めい,みょう,いのち;岸がん,きし;放ほう,はな,はなす,っぱな,っぱなし,はなつ,はなれる,こ,こく,ほうる;昔せき,しゃく,むかし;波は,なみ;注ちゅう,そそ,そそぐ,さ,さす,つ,つぐ;育いく,そだ,そだつ,そだち,そだてる,はぐく,はぐくむ;拾しゅう,じゅう,ひろ,ひろう;指し,ゆび,さ,さす,さし;洋よう;神しん,じん,かみ,かん,こう;秒びょう;級きゅう;追つい,お,おう;戦せん,いくさ,たたか,たたかう,おのの,おののく,そよ,そよぐ,わなな,わななく;競きょう,けい,きそ,きそう,せ,せる,くら,くらべる;良りょう,よ,よい,い,いい;功こう,く,いさお;特とく;便べん,びん,たよ,たより;働どう,はたら,はたらく;令れい;意い;味み,あじ,あじわう;勉べん,つと,つとめる;庭てい,にわ;息そく,いき;旅りょ,たび;根こん,ね;流りゅう,る,なが,ながれる,ながれ,ながす;消しょう,き,きえる,け,けす;倍ばい;員いん;島とう,しま;祭さい,まつ,まつる,まつり;章しょう;第だい,てい;都と,つ,みやこ;動どう,うご,うごく,うごかす;商しょう,あきな,あきなう;悪あく,お,わる,わるい,あ,あし,にく,にくい,ああ,いずくに,いずくんぞ,にくむ;族ぞく;深しん,ふか,ふかい,ぶか,ぶかい,ふかまる,ふかめる,み;球きゅう,たま;童どう,わらべ;陽よう,ひ;階かい,きざはし;寒かん,さむ,さむい;悲ひ,かな,かなしい,かなしむ;暑しょ,あつ,あつい;期き,ご;植しょく,う,うえる,うわる;歯し,よわい,は,よわ,よわいする;温おん,あたた,あたたか,あたたかい,あたたまる,あたためる,ぬく;港こう,みなと;湯とう,ゆ;登とう,と,どう,しょう,ちょう,のぼ,のぼる,あ,あがる;着ちゃく,じゃく,き,きる,ぎ,きせる,きせ,つ,つく,つける;短たん,みじか,みじかい;野や,しょ,の;泉せん,いずみ;生せい,しょう,い,いきる,いかす,いける,う,うまれる,うま,うまれ,うむ,お,おう,は,はえる,はやす,き,なま,な,なる,なす,む,むす;亡ぼう,もう,な,ない,なき,ほろ,ほろびる,ほろぶ,ほろぼす;合ごう,がっ,かっ,あ,あう,あい,あわす,あわせる;風ふう,ふ,かぜ,かざ;予よ,しゃ,あらかじ,あらかじめ;反はん,ほん,たん,ほ,そ,そる,そらす,かえ,かえす,かえる;新しん,あたら,あたらしい,あら,あらた,にい;返へん,かえ,かえす,かえる;問もん,と,とう,とい,とん;宿しゅく,やど,やどる,やどす;想そう,そ,おも,おもう;感かん;整せい,ととの,ととのえる,ととのう;暗あん,くら,くらい,くらむ,くれ,くれる;様よう,しょう,さま,さん;橋きょう,はし;福ふく;緑りょく,ろく,みどり;練れん,ね,ねる,ねり;詩し,うた;銀ぎん,しろがね;題だい;館かん,やかた,たて;駅えき;億おく;器き,うつわ;士し,さむらい;料りょう;標ひょう,しるべ,しるし;殺さつ,さい,せつ,ころ,ころす,ごろ,ごろし,そ,そぐ;然ぜん,ねん,しか,しかり,しかし,さ;熱ねつ,あつ,あつい;課か;賞しょう,ほ,ほめる;輪りん,わ;選せん,えら,えらぶ;鏡きょう,けい,かがみ;願がん,ねが,ねがう,ねがい;養よう,りょう,やしな,やしなう;像ぞう;情じょう,せい,なさ,なさけ;謝しゃ,あやま,あやまる;映えい,うつ,うつる,うつす,は,はえる,ば,ばえ;疑ぎ,うたが,うたがう;皆かい,みな,みんな;例れい,たと,たとえる;卒そつ,しゅつ,そっ,そっする,お,おえる,おわる,ついに,にわか;協きょう;参さん,しん,まい,まいる,まじわる,みつ;周しゅう,まわ,まわり;囲い,かこ,かこむ,かこう,かこい;固こ,かた,かためる,かたまる,かたまり,かたい;季き;完かん;希き,け,まれ;念ねん;折せつ,しゃく,お,おる,おり,おれる;望ぼう,もう,のぞ,のぞむ,もち;材ざい;束そく,たば,たばねる,つか,つかねる;松しょう,まつ;残ざん,さん,のこ,のこる,のこす,そこな,そこなう,のこり;求きゅう,ぐ,もと,もとめる;的てき,まと;約やく,つづ,つづまる,つづめる,つづま,つづまやか;芸げい,うん,う,うえる,のり,わざ;基き,もと,もとい;性せい,しょう,さが;技ぎ,わざ;格かく,こう,きゃく,ごう;能のう,よ,よく;術じゅつ,すべ;私し,わたくし,わたし;骨こつ,ほね;妥だ;雰ふん;頑がん,かたく;寺じ,てら;岩がん,いわ;帰き,かえ,かえる,かえす,おく,おくる,とつ,とつぐ;春しゅん,はる;昼ちゅう,ひる;晴せい,は,はれる,はれ,ば,ばれ,はらす;秋しゅう,あき,とき;計けい,はか,はかる,はからう;列れつ,れ;区く,おう,こう;坂はん,さか;式しき;信しん;勇ゆう,いさ,いさむ;単たん,ひとえ;司し,つかさど,つかさどる;変へん,か,かわる,かわり,かえる;夫ふ,ふう,ぶ,おっと,それ;建けん,こん,た,たてる,たて,だ,だて,たつ;昨さく;毒どく;法ほう,はっ,ほっ,ふらん,のり;泣きゅう,な,なく;浅せん,あさ,あさい;紀き;英えい,はなぶさ;軍ぐん,いくさ;飯はん,めし;仏ぶつ,ふつ,ほとけ;築ちく,きず,きずく;晩ばん;猫びょう,ねこ;園えん,その;曜よう;書しょ,か,かく,が,がき;遠えん,おん,とお,とおい;門もん,かど,と;係けい,かか,かかる,かかり,がかり,かかわる;取しゅ,と,とる,とり,ど,どり;品ひん,ほん,しな;守しゅ,す,まも,まもる,まもり,もり,かみ;幸こう,さいわ,さいわい,さち,しあわ,しあわせ;急きゅう,いそ,いそぐ,いそぎ,せ,せく;真しん,ま,まこと;箱そう,はこ;荷か,に;面めん,べん,おも,おもて,つら;典てん,でん;喜き,よろこ,よろこぶ,よろこばす;府ふ;治じ,ち,おさ,おさめる,おさまる,なお,なおる,なおす;浴よく,あ,あびる,あびせる;笑しょう,わら,わらう,え,えむ;辞じ,や,やめる,いな,いなむ;関かん,せき,ぜき,かか,かかわる,からくり,かんぬき;保ほ,ほう,たも,たもつ;弁べん,へん,かんむり,わきま,わきまえる,わ,わける,はなびら,あらそ,あらそう;政せい,しょう,まつりごと,まん;留りゅう,る,と,とめる,とまる,とど,とどめる,とどまる,るうぶる;証しょう,あかし;険けん,けわ,けわしい;危き,あぶ,あぶない,あや,あやうい,あやぶむ;存そん,ぞん,ながら,ながらえる,あ,ある,たも,たもつ,と,とう;専せん,もっぱ,もっぱら;冒ぼう,おか,おかす;冗じょう;阪はん,さか;原げん,はら;細さい,ほそ,ほそい,ほそる,こま,こまか,こまかい;薬やく,くすり;鼻び,はな;側そく,かわ,がわ,そば;兵へい,ひょう,つわもの;堂どう;塩えん,しお;席せき,むしろ;敗はい,やぶ,やぶれる;果か,は,はたす,はた,はてる,はて;栄えい,よう,さか,さかえる,は,はえ,ば,ばえ,はえる,え;梅ばい,うめ;無む,ぶ,な,ない;結けつ,けち,むす,むすぶ,ゆ,ゆう,ゆわえる;因いん,よ,よる,ちな,ちなむ;常じょう,つね,とこ;識しき,し,しる,しるす;非ひ,あら,あらず;干かん,ほ,ほす,ほし,ぼ,ぼし,ひ,ひる;是ぜ,し,これ,この,ここ;渉しょう,わた,わたる;虚きょ,こ,むな,むなしい,うつ,うつろ;官かん;察さつ;底てい,そこ;愛あい,いと,いとしい,かな,かなしい,め,めでる,お,おしむ,まな;署しょ;警けい,いまし,いましめる;恋れん,こ,こう,こい,こいしい;覚かく,おぼ,おぼえる,さ,さます,さめる,さと,さとる;説せつ,ぜい,と,とく;幻げん,まぼろし;訓くん,きん,おし,おしえる,よ,よむ,くんずる;試し,こころ,こころみる,ため,ためす;弓きゅう,ゆみ;告こく,つ,つげる;種しゅ,たね,ぐさ;達たつ,だ,たち;類るい,たぐ,たぐい;報ほう,むく,むくいる;祈き,いの,いのる;等とう,ひと,ひとしい,など,ら;汽き;借しゃく,か,かりる;焼しょう,や,やく,やき,やける;座ざ,すわ,すわる;忘ぼう,わす,わすれる;洗せん,あら,あらう;胸きょう,むね,むな;脳のう,どう,のうずる;僧そう;禅ぜん,せん,しずか,ゆず,ゆずる;験けん,げん,あかし,しるし,ため,ためす,ためし;可か,こく,べ,べき,べし;許きょ,ゆる,ゆるす,もと;枚まい,ばい;静せい,じょう,しず,しずか,しずまる,しずめる;句く;禁きん;喫きつ,の,のむ;煙えん,けむ,けむる,けむり,けむい;加か,くわ,くわえる,くわわる;節せつ,せち,ふし,ぶし,のっと;減げん,へ,へる,へらす;順じゅん;容よう,い,いれる;布ふ,ぬの;易えき,い,やさ,やさしい,やす,やすい;財ざい,さい,ぞく,たから;若じゃく,にゃく,にゃ,わか,わかい,も,もしくわ,もし,もしくは,ごと,ごとし;詞し,ことば;昆こん;閥ばつ;歴れき,れっき;舌ぜつ,した;冊さつ,さく,ふみ;宇う;宙ちゅう;忙ぼう,もう,いそが,いそがしい,せわ,せわしい,おそ,おそれる,うれえるさま;履り,は,はく;団だん,とん,かたまり,まる,まるい;暴ぼう,ばく,あば,あばく,あばれる;混こん,ま,まじる,まじり,まざる,まぜる,こ,こむ;乱らん,ろん,みだ,みだれる,みだる,みだす,おさ,おさめる,わた,わたる;徒と,いたずら,あだ;得とく,え,える,う,うる;改かい,あらた,あらためる,あらたまる;続ぞく,しょく,こう,きょう,つづ,つづく,つづける,つぐ,つぐない;連れん,つら,つらなる,つらねる,つ,つれる,づ,づれ;善ぜん,よ,よい,い,いい,よく,よし,よしとする;困こん,こま,こまる;絡らく,から,からむ,からまる;比ひ,くら,くらべる;災さい,わざわ,わざわい;機き,はた;率そつ,りつ,しゅつ,ひき,ひきいる;飛ひ,と,とぶ,とばす;害がい;余よ,あま,あまる,あまり,あます,あんま,あんまり;難なん,かた,かたい,がた,がたい,むずか,むずかしい,むづか,むづかしい,むつか,むつかしい,にく,にくい;妨ぼう,さまた,さまたげる;被ひ,こうむ,こうむる,おお,おおう,かぶ,かぶる,かぶせる;裕ゆう;震しん,ふる,ふるう,ふるえる;尻こう,しり;尾び,お;械かい,かせ;確かく,こう,たし,たしか,たしかめる;嫌けん,げん,きら,きらう,きらい,いや;個こ,か;圧あつ,えん,おう,お,おす,へ,へす,おさ,おさえる;在ざい,あ,ある;夢む,ぼう,ゆめ,ゆめみる,くら,くらい;産さん,う,うむ,うまれる,うぶ,む,むす;倒とう,たお,たおれる,だお,だおれ,たおす,さかさま,さかさ,さかしま;臭しゅう,くさ,くさい,にお,におう,におい;厚こう,あつ,あつい,あか;妻さい,つま;議ぎ;犯はん,ぼん,おか,おかす;罪ざい,つみ;防ぼう,ふせ,ふせぐ;穴けつ,あな;論ろん;経けい,きょう,きん,へ,へる,た,たつ,たていと,はか,はかる,のり;笛てき,ふえ;史し;敵てき,かたき,あだ,かな,かなう;済さい,せい,す,すむ,ず,ずみ,すまない,すます,すく,すくう,な,なす,わたし,わた,わたる;委い,ゆだ,ゆだねる;挙きょ,あ,あげる,あがる,こぞ,こぞる;判はん,ばん,わか,わかる;制せい;務む,つと,つとめる;査さ;総そう,す,すべて,すべ,ふさ;設せつ,もう,もうける;資し;権けん,ごん,おもり,かり,はか,はかる;件けん,くだん;派は;岡こう,おか;素そ,す,もと;断だん,た,たつ,ことわ,ことわる,さだ,さだめる;評ひょう;批ひ;任にん,まか,まかせる,まかす;検けん,しら,しらべる;審しん,つまび,つまびらか,つぶさ,つぶさに;条じょう,ちょう,でき,えだ,すじ;責せき,せ,せめる;省せい,しょう,かえり,かえりみる,はぶ,はぶく;増ぞう,ま,ます,まし,ふ,ふえる,ふやす;税ぜい;解かい,げ,と,とく,とかす,とける,ほど,ほどく,ほどける,わか,わかる,さと,さとる;際さい,きわ,ぎわ;認にん,みと,みとめる,したた,したためる;企き,くわだ,くわだてる,たくら,たくらむ;義ぎ;罰ばつ,ばち,はつ,ばっ,ばっする;誕たん;脱だつ,ぬ,ぬぐ,ぬげる;過か,す,すぎる,すぎ,すごす,あやま,あやまつ,あやまち,よ,よぎる;坊ぼう,ぼっ;寝しん,ね,ねる,ねかす,い,いぬ,みたまや,や,やめる;宮きゅう,ぐう,く,くう,みや;各かく,おのおの;案あん,つくえ;置ち,お,おく,おき;費ひ,つい,ついやす,ついえる;価か,け,あたい;勢せい,ぜい,いきお,いきおい,はずみ;営えい,いとな,いとなむ,いとなみ;示じ,し,しめ,しめす;統とう,す,すべる,ほび,ほびる;領りょう,えり;策さく;藤とう,どう,ふじ;副ふく;観かん,み,みる,しめ,しめす;値ち,ね,あたい;吸きゅう,す,すう;域いき;姿し,すがた;応おう,よう,のう,あた,あたる,まさに,こた,こたえる;提てい,ちょう,だい,さ,さげる;援えん;状じょう;態たい,わざ,わざと;賀が;収しゅう,おさ,おさめる,おさまる;停てい,と,とめる,とまる;革かく,かわ;職しょく,そく;鬼き,おに;規き;護ご,まも,まもる;割かつ,わ,わる,わり,われる,さ,さく;裁さい,た,たつ,さば,さばく;崎き,さき,さい,みさき;演えん;律りつ,りち,れつ;師し,いくさ;看かん,み,みる;準じゅん,じゅんじる,じゅんずる,なぞら,なぞらえる,のり,ひと,ひとしい,みずもり;則そく,のっと,のっとる;備び,そな,そなえる,そなわる,つぶさ,つぶさに;導どう,みちび,みちびく;幹かん,みき;張ちょう,は,はる,はり,ば,ばり;優ゆう,う,やさ,やさしい,すぐ,すぐれる,まさ,まさる;宅たく;沢たく,さわ,うるお,うるおい,うるおす,つや;施し,せ,ほどこ,ほどこす;現げん,あらわ,あらわれる,あらわす,うつつ,うつ;乳にゅう,ちち,ち;呼こ,よ,よぶ;城じょう,せい,しろ;俳はい;秀しゅう,ひい,ひいでる;担たん,かつ,かつぐ,にな,になう;額がく,ひたい;製せい;違い,ちが,ちがう,ちがい,ちがえる,たが,たがう,たがえる;輸ゆ,しゅ;燃ねん,も,もえる,もやす,もす;祝しゅく,しゅう,いわ,いわう;届かい,とど,とどける,とどけ,とどく;狭きょう,こう,せま,せまい,せば,せばめる,せばまる,さ;肩けん,かた;腕わん,うで;腰よう,こし;触しょく,ふ,ふれる,さわ,さわる;載さい,の,のせる,のる;層そう;型けい,かた,がた;庁ちょう,てい,やくしょ;視し,み,みる;差さ,さす,さし;管かん,くだ;象しょう,ぞう,かたど,かたどる;量りょう,はか,はかる;境きょう,けい,さかい;環かん,わ;武ぶ,む,たけ,たけし;質しつ,しち,ち,たち,ただ,ただす,もと,わりふ;述じゅつ,の,のべる;供きょう,く,くう,ぐ,そな,そなえる,とも,ども;展てん;販はん;株しゅ,かぶ;限げん,かぎ,かぎる,かぎり;与よ,あた,あたえる,あずか,あずかる,くみ,くみする,ともに;含がん,ふく,ふくむ,ふくめる;影えい,かげ;況きょう,まし,まして,いわ,いわんや,おもむき;渡と,わた,わたる,わたす;響きょう,ひび,ひびく;票ひょう;景けい;抜ばつ,はつ,はい,ぬ,ぬく,ぬき,ぬける,ぬかす,ぬかる;訴そ,うった,うったえる;訟しょう;逮たい;補ほ,おぎな,おぎなう;候こう,そうろう;構こう,かま,かまえる,かまう;模も,ぼ;捕ほ,と,とらえる,とらわれる,とる,とら,つか,つかまえる,つかまる;鮮せん,あざ,あざやか;効こう,き,きく,ききめ,なら,ならう;属ぞく,しょく,さかん,つく,やから;慣かん,な,なれる,ならす;豊ほう,ぶ,ゆた,ゆたか,とよ;満まん,ばん,み,みちる,みつ,みたす;肥ひ,こ,こえる,こえ,こやす,こやし,ふと,ふとる;巻かん,けん,ま,まく,まき;捜そう,しゅ,しゅう,さが,さがす;絞こう,しぼ,しぼる,し,しめる,しまる;輩はい,ばら,やから,やかい,ともがら;隠いん,おん,かく,かくす,かくし,かくれる,かか,かかす,よ,よる;掛かい,けい,か,かける,かけ,が,がけ,かかる,がかる,かかり,がかり;替たい,か,かえる,かえ,かわる;居きょ,こ,い,いる,お,おる;造ぞう,つく,つくる,つくり,づく,づくり;授じゅ,さず,さずける,さずかる;印いん,しるし,じるし,しる,しるす;創そう,しょう,つく,つくる,はじ,はじめる,きず,けず,けずしける;復ふく,また;往おう,い,いく,いにしえ,さき,さきに,ゆ,ゆく;較かく,こう,くら,くらべる;筆ひつ,ふで;鉛えん,なまり;貯ちょ,た,ためる,たくわ,たくわえる;故こ,ゆえ,ふる,ふるい,もと;障しょう,さわ,さわる;従じゅう,しょう,じゅ,したが,したがう,したがえる,より;我が,われ,わ,わが;激げき,はげ,はげしい;刺し,さ,さす,ささる,さし,とげ;励れい,はげ,はげむ,はげます;討とう,う,うつ;郵ゆう;針しん,はり;徴ちょう,ち,しるし;怪かい,け,あや,あやしい,あやしむ;獣じゅう,けもの,けだもの;突とつ,か,つ,つく;菓か;河か,かわ;振しん,ふ,ふる,ぶ,ぶる,ふり,ぶり,ふるう;汗かん,あせ;豚とん,ぶた;再さい,さ,ふたた,ふたたび;接せつ,しょう,つ,つぐ;独どく,とく,ひと,ひとり;占せん,し,しめる,うらな,うらなう;招しょう,まね,まねく;段だん,たん;胃い;腹ふく,はら;痛つう,いた,いたい,いたむ,いたましい,いためる;退たい,しりぞ,しりぞく,しりぞける,ひ,ひく,の,のく,のける,ど,どく;屈くつ,かが,かがむ,かがめる;悩のう,なや,なやむ,なやます,なやましい,なやみ;暇か,ひま,いとま;織しょく,しき,お,おる,おり;貸たい,か,かす,かし;迷めい,まよ,まよう;惑わく,まど,まどう;誘ゆう,さそ,さそう,いざな,いざなう;就しゅう,じゅ,つ,つく,つける;訪ほう,おとず,おとずれる,たず,たずねる,と,とう;怒ど,ぬ,いか,いかる,おこ,おこる;昇しょう,のぼ,のぼる;眠みん,ねむ,ねむる,ねむい;睡すい,ねむ,ねむる,ねむい;症しょう;締てい,し,しまる,しまり,しめる,しめ,じ,じめ;迫はく,せま,せまる;靴か,くつ;濃のう,こ,こい;端たん,はし,は,はた,ばた,はな;極きょく,ごく,きわ,きわめる,きわまる,きわまり,きわみ,き,きめる,ぎ,ぎめ,きまる;途と,みち;健けん,すこ,すこやか;康こう;郎ろう,りょう,おとこ;給きゅう,たま,たまう,たも,たもう,たまえ;逆ぎゃく,げき,さか,さかさ,さからう;巨きょ;庫こ,く,くら;児じ,に,げい,こ,っこ;冷れい,つめ,つめたい,ひ,ひえる,ひや,ひややか,ひやす,ひやかす,さ,さめる,さます;凍とう,こお,こおる,こご,こごえる,こごる,い,いてる,し,しみる;幼よう,おさな,おさない;稚ち,じ,いとけない,おさない,おくて,おでる;処しょ,ところ,こ,お,おる;博はく,ばく;清せい,しょう,しん,きよ,きよい,きよまる,きよめる;潔けつ,いさぎよ,いさぎよい;録ろく,しる,しるす,と,とる;隊たい;修しゅう,しゅ,おさ,おさめる,おさまる;券けん;婦ふ,よめ;奇き,く,くしき,あや,あやしい,くし,めずら,めずらしい;妙みょう,びょう,たえ;麗れい,うるわ,うるわしい,うら,うららか;微び,かす,かすか;益えき,やく,ま,ます;移い,うつ,うつる,うつす;程てい,ほど;精せい,しょう,しら,しらげる,くわ,くわしい;絶ぜつ,た,たえる,たやす,たつ;並へい,ほう,な,なみ,なら,ならべる,ならぶ,ならびに;憲けん;衆しゅう,しゅ,おお,おおい;傘さん,かさ;浜ひん,はま;撃げき,う,うつ;攻こう,せ,せめる;監かん;杯はい,さかずき;乾かん,けん,かわ,かわく,かわかす,ほ,ほす,ひ,ひる,いぬい;催さい,もよう,もようす,もよお,もよおす;促そく,うなが,うながす;欧おう,うた,うたう,は,はく;江こう,え;請せい,しん,しょう,こ,こう,う,うける;雄ゆう,お,おす,おん;韓かん,から,いげた;壊かい,え,こわ,こわす,こわれる,やぶ,やぶる;診しん,み,みる;閣かく;僚りょう;積せき,つ,つむ,づ,づみ,つもる,つもり;督とく;臣しん,じん;略りゃく,ほぼ,はぶ,はぶく,おか,おかす,おさ,おさめる,はかりごと,はか,はかる;航こう;寄き,よ,よる,より,よせる;板はん,ばん,いた;街がい,かい,まち;宗しゅう,そう,むね;緊きん,し,しめる,しまる;娘じょう,むすめ,こ;宴えん,うたげ;怖ふ,ほ,こわ,こわい,こわがる,お,おじる,おそ,おそれる;恐きょう,おそ,おそれる,おそる,おそろしい,こわ,こわい,こわがる;添てん,そ,そえる,そう;猛もう;烈れつ,はげ,はげしい;索さく;詰きつ,きち,つ,つめる,つめ,づ,づめ,つまる,つむ;詳しょう,くわ,くわしい,つまび,つまびらか;魅み;渇かつ,かわ,かわく;系けい;婚こん;遊ゆう,ゆ,あそ,あそぶ,あそばす;旗き,はた;照しょう,て,てる,てらす,てれる;快かい,こころよ,こころよい;版はん;貧ひん,びん,まず,まずしい;乏ぼう,とぼ,とぼしい,とも,ともしい;適てき,かな,かなう;預よ,あず,あずける,あずかる;延えん,の,のびる,のべる,のべ,のばす;翌よく;覧らん,み,みる;懐かい,え,ふところ,なつ,なつかしい,なつかしむ,なつく,なつける,なず,なずける,いだ,いだく,おも,おもう;押おう,お,おす,おし,おっ,おさえる,おさ;更こう,さら,さらに,ふ,ふける,ふかす;枕ちん,しん,まくら;浮ふ,う,うく,うかれる,うかぶ,む,うかべる;漏ろう,も,もる,もれる,もらす;符ふ;購こう;越えつ,おつ,こ,こす,ご,ごし,こえる,ごえ;飾しょく,かざ,かざる,かざり;騒そう,さわ,さわぐ,うれい,さわがしい;背はい,せ,せい,そむ,そむく,そむける;撮さつ,と,とる,つま,つまむ,ど,どり;盗とう,ぬす,ぬすむ,ぬすみ;離り,はな,はなれる,はなす;融ゆう,と,とける,とかす;編へん,あ,あむ,あみ;華か,け,はな;既き,すで,すでに;普ふ,あまね,あまねく,あまねし;豪ごう,えら,えらい;鑑かん,かんが,かんがみる,かがみ;除じょ,じ,のぞ,のぞく,よ,よけ;尋じん,たず,たずねる,ひろ;幾き,いく,いくつ,いくら;廊ろう;掃そう,しゅ,は,はく;泥でい,ない,で,に,どろ,なず,なずむ;棒ぼう;驚きょう,おどろ,おどろく,おどろかす;嘆たん,なげ,なげく,なげかわしい;倉そう,くら;孫そん,まご;巣そう,す,すくう;帯たい,お,おびる,おび;径けい,みち,こみち,さしわたし,ただちに;救きゅう,すく,すくう;散さん,ち,ちる,ちらす,ちらかす,ちらかる,ちらばる,ばら,ばらける;粉ふん,でしめーとる,こ,こな;脈みゃく,すじ;菜さい,な;貨か,たから;陸りく,ろく,おか;似じ,に,にる,ひ,ひる;均きん,なら,ならす;墓ぼ,はか;富ふ,ふう,と,とむ,とみ;徳とく;探たん,さぐ,さぐる,さが,さがす;偵てい;序じょ,つい,ついで;迎げい,むか,むかえる;志し,しりんぐ,こころざ,こころざす,こころざし;恩おん;採さい,と,とる;桜おう,よう,さくら;永えい,なが,ながい;液えき;眼がん,げん,まなこ,め;祖そ;績せき;興こう,きょう,おこ,おこる,おこす;衛えい,え;複ふく;雑ざつ,ぞう,まじ,まじえる,まじる;賛さん,たす,たすける,たた,たたえる;酸さん,す,すい;銭せん,ぜん,ぜに,すき;飼し,か,かう;傷しょう,きず,いた,いたむ,いためる;党とう,なかま,むら;卵らん,たまご;厳げん,ごん,おごそ,おごそか,きび,きびしい,いか,いかめしい,いつくし;捨しゃ,す,すてる;込こ,こむ,こみ,こめる;密みつ,ひそ,ひそか;汚お,けが,けがす,けがれる,けがらわしい,よご,よごす,よごれる,きたな,きたない;欲よく,ほっ,ほっする,ほ,ほしい;暖だん,のん,あたた,あたたか,あたたかい,あたたまる,あたためる;机き,つくえ;秘ひ,ひめる,ひそ,ひそか,かく,かくす;訳やく,わけ;染せん,そ,そめる,ぞ,ぞめ,そまる,し,しみる,じ,じみる,しみ,しめる;簡かん,けん,えら,えらぶ,ふだ;閉へい,と,とじる,とざす,し,しめる,しまる,た,たてる;誌し;窓そう,す,まど,てんまど,けむだし;否ひ,いな,いや;筋きん,すじ;垂すい,た,たれる,たらす,たれ,なんなんと,なんなんとす;宝ほう,たから;宣せん,のたま,のたまう;尊そん,たっと,たっとい,とうと,とうとい,たっとぶ,とうとぶ;忠ちゅう;拡かく,こう,ひろ,ひろがる,ひろげる,ひろめる;操そう,さん,みさお,あやつ,あやつる;敬けい,きょう,うやま,うやまう;暮ぼ,く,くれる,くらす;灰かい,はい;熟じゅく,う,うれる;異い,こと,ことなる,け;皇こう,おう;盛せい,じょう,も,もる,さか,さかる,さかん;砂さ,しゃ,すな;漠ばく;糖とう;納のう,なっ,な,なん,とう,おさ,おさめる,おさまる;肺はい;著ちょ,ちゃく,あらわ,あらわす,いちじる,いちじるしい;蒸じょう,せい,む,むす,むれる,むらす;蔵ぞう,そう,くら,おさ,おさめる,かく,かくれる;装そう,しょう,よそお,よそおう,よそおい;裏り,うら;諸しょ,もろ;賃ちん;誤ご,あやま,あやまる;臓ぞう,はらわた;貴き,たっと,たっとい,とうと,とうとい,たっとぶ,とうとぶ;降こう,ご,お,おりる,おろす,ふ,ふる,ふり,くだ,くだる,くだす;丼とん,たん,しょう,せい,どんぶり;吐と,は,はく,つ,つく;奴ど,やつ,やっこ;隷れい,したが,したがう,しもべ;芋う,いも;縮しゅく,ちぢ,ちぢむ,ちぢまる,ちぢめる,ちぢれる,ちぢらす;純じゅん;縦じゅう,たて;粋すい,いき;聖せい,しょう,ひじり;磁じ;紅こう,く,べに,くれない,あか,あかい;射しゃ,い,いる,さ,さす,う,うつ;幕まく,ばく,とばり;拝はい,おが,おがむ,おろが,おろがむ;薦せん,すす,すすめる;推すい,お,おす;揮き,ふる,ふるう;沿えん,そ,そう,ぞ,ぞい;源げん,みなもと;劇げき;勤きん,ごん,つと,つとめる,づと,づとめ,つとまる,いそ,いそしむ;歓かん,よろこ,よろこぶ;承しょう,じょう,うけたまわ,うけたまわる,う,うける;損そん,そこ,そこなう,そこな,そこねる;枝し,えだ;爪そう,つめ,つま;豆とう,ず,まめ;刻こく,きざ,きざむ,きざみ;腐ふ,くさ,くさる,くされる,くされ,くさらす,くさす;遅ち,おく,おくれる,おくらす,おそ,おそい;彫ちょう,ほ,ほる,ぼ,ぼり;測そく,はか,はかる;破は,やぶ,やぶる,やぶれる,わ,われる;舎しゃ,せき,やど,やどる;講こう;滞たい,てい,とどこお,とどこおる;紹しょう;介かい;己こ,き,おのれ,つちのと,な;厄やく;亀き,きゅう,きん,かめ;互ご,たが,たがい,かたみ,かたみに;剣けん,つるぎ;寿じゅ,す,しゅう,ことぶき,ことぶ,ことぶく,ことほ,ことほぐ;彼ひ,かれ,かの,か;恥ち,は,はじる,はじ,はじらう,はずかしい;杉さん,すぎ;汁じゅう,しる,つゆ;炎えん,ほのお;為い,ため,な,なる,なす,す,する,たり,つく,つくる,なり;熊ゆう,くま;獄ごく;酔すい,よ,よう,よい;酢さく,す;鍋か,なべ;湖こ,みずうみ;銅どう,あかがね;払ふつ,ひつ,ほつ,はら,はらう,はらい,ばら,ばらい;油ゆ,ゆう,あぶら;旧きゅう,ふる,ふるい,もと;姓せい,しょう;貿ぼう;将しょう,そう,まさ,まさに,はた,ひきい,ひきいる,もって;盟めい;遺い,ゆい,のこ,のこす;伸しん,の,のびる,のばす,のべる,のす;債さい;及きゅう,およ,およぶ,および,およぼす;奈な,ない,だい,いかん,からなし;幅ふく,はば;廃はい,すた,すたれる,すたる;甘かん,あま,あまい,あまえる,あまやかす,うま,うまい;換かん,か,かえる,かわる;摘てき,つ,つむ;核かく;沖ちゅう,おき,おきつ,ちゅうする,わく;縄じょう,なわ,ただ,ただす;津しん,つ;献けん,こん,たてまつ,たてまつる;療りょう;継けい,つ,つぐ,まま;維い;舞ぶ,ま,まう,まい;伎ぎ,き,わざ,わざおぎ;踏とう,ふ,ふむ,ふまえる;般はん;頼らい,たの,たのむ,たのもしい,たよ,たよる;依い,え,よ,よる;鹿ろく,しか,か;諾だく;牙が,げ,きば,は;跳ちょう,は,はねる,と,とぶ,とび;昭しょう;漁ぎょ,りょう,あさ,あさる;償しょう,つぐな,つぐなう;刑けい;募ぼ,つの,つのる;執しつ,しゅう,と,とる;塁るい,らい,すい,とりで;崩ほう,くず,くずれる,くずれ,くずす;患かん,わずら,わずらう;戻れい,もど,もどす,もどる;抗こう,あらが,あらがう;抵てい;旬じゅん,しゅん;湾わん,いりえ;爆ばく,は,はぜる;弾だん,たん,ひ,ひく,ひき,はず,はずむ,たま,はじ,はじく,はじける,ただ,ただす,はじきゆみ;聴ちょう,てい,き,きく,ゆる,ゆるす;跡せき,あと;遣けん,つか,つかう,つかい,づか,づかい,つかわす,や,やる;闘とう,たたか,たたかう,あらそ,あらそう;陣じん;香こう,きょう,か,かお,かおり,かおる;兆ちょう,きざ,きざす,きざし;臨りん,のぞ,のぞむ;削さく,けず,けずる,はつ,はつる,そ,そぐ;契けい,ちぎ,ちぎる;恵けい,え,めぐ,めぐむ,めぐみ;抱ほう,だ,だく,いだ,いだく,かか,かかえる;掲けい,かか,かかげる;狙そ,しょ,ねら,ねらう,ねらい;葬そう,ほうむ,ほうむる;需じゅ;齢れい,よわい,とし;宜ぎ,よろ,よろしい,よろしく;繰そう,く,くる;避ひ,さ,さける,よ,よける;妊にん,じん,はら,はらむ,みごも,みごもる;娠しん;致ち,いた,いたす;刊かん;奏そう,かな,かなでる;伴はん,ばん,ともな,ともなう;併へい,あわ,あわせる;傾けい,かたむ,かたむく,かたむける,かたぶ,かたぶく,かた,かたげる,かし,かしげる;却きゃく,かえ,かえって,しりぞ,しりぞく,しりぞける;奥おう,おく,おくまる,くま;慮りょ,おもんぱく,おもんぱくる,おもんぱか,おもんぱかる;懸けん,け,か,かける,かかる;房ぼう,ふさ;扱そう,きゅう,あつか,あつかい,あつかう,あつかる,こ,こく;抑よく,おさ,おさえる;択たく,えら,えらぶ;描びょう,えが,えがく,か,かく;盤ばん;称しょう,たた,たたえる,とな,となえる,あ,あげる,かな,かなう,はか,はかり,はかる,ほめ,ほめる;緒しょ,ちょ,お,いとぐち;緩かん,ゆる,ゆるい,ゆるやか,ゆるむ,ゆるめる;託たく,かこつ,かこつける,かこ;賄わい,まかな,まかなう;賂ろ,まいな,まいない,まいなう;贈ぞう,そう,おく,おくる;逃とう,に,にげる,にがす,のが,のがす,のがれる;還かん,かえ,かえる;超ちょう,こ,こえる,こす;邦ほう,くに;鈴れい,りん,すず;阜ふ,ふう;岐き,ぎ;隆りゅう;雇こ,やと,やとう;控こう,ひか,ひかえる,ひかえ;壁へき,かべ;棋き,ご;渋じゅう,しゅう,しぶ,しぶい,しぶる;片へん,かた;群ぐん,む,むれる,むれ,むら,むらがる;仙せん,せんと;充じゅう,あ,あてる,み,みたす;免めん,まぬか,まぬかれる,まぬが,まぬがれる;勧かん,けん,すす,すすめる;圏けん,かこ,かこい;埋まい,う,うめる,うまる,うもれる,うず,うずめる,うずまる,い,いける;埼き,さき,さい,みさき;奪だつ,うば,うばう;御ぎょ,ご,おん,お,み;慎しん,つつし,つつしむ,つつ,つつましい,つつしみ;拒きょ,ご,こば,こばむ;枠わく;甲こう,かん,きのえ;祉し;稲とう,て,いね,いな;譲じょう,ゆず,ゆずる;謙けん,へりくだ,へりくだる;躍やく,おど,おどる;銃じゅう,つつ;項こう,うなじ;鋼こう,はがね;顧こ,かえり,かえりみる;駐ちゅう;駆く,か,かける,かる;柱ちゅう,はしら;唱しょう,とな,となえる;孝こう,きょう;俊しゅん;兼けん,か,かねる;剤ざい,すい,せい,かる,けず,けずる;吹すい,ふ,ふく;堀くつ,ほり;巡じゅん,めぐ,めぐる,めぐり;戒かい,いまし,いましめる;排はい;携けい,たずさ,たずさえる,たずさわる;敏びん,さとい;鋭えい,するど,するどい;敷ふ,し,しく,しき;殿でん,てん,との,どの;犠ぎ,き,いけにえ;獲かく,え,える;茂も,しげ,しげる;繁はん,しげ,しげる,しげく;頻ひん,しき,しきりに;殖しょく,ふ,ふえる,ふやす;薄はく,うす,うすい,うすめる,うすまる,うすらぐ,うすら,うすれる,すすき;衝しょう,つ,つく;誉よ,ほま,ほまれ,ほ,ほめる;褒ほう,ほ,ほめる;透とう,す,すく,すかす,すける,とうる,とうす;隣りん,とな,となる,となり;雅が,みや,みやび;遜そん,したが,したがう,へりくだ,へりくだる,ゆず,ゆずる;伺し,うかが,うかがう;徹てつ;瀬らい,せ;撤てつ;措そ,お,おく;拠きょ,こ,よ,よる;儀ぎ;樹じゅ,き;棄き,す,すてる;虎こ,とら;蛍けい,ほたる;蜂ほう,はち;酎ちゅう,ちゅ,かも,かもす;蜜みつ,びつ;艦かん;潜せん,ひそ,ひそむ,もぐ,もぐる,かく,かくれる,くぐ,くぐる,ひそめる;拳けん,げん,こぶし;炭たん,すみ;畑はた,はたけ,ばたけ;包ほう,つつ,つつむ,くる,くるむ;衣い,え,ころも,きぬ,ぎ;仁じん,に,にん;鉱こう,あらがね;至し,いた,いたる;誠せい,まこと;郷きょう,ごう,さと;侵しん,おか,おかす;偽ぎ,か,いつわ,いつわる,にせ,いつわり;克こく,か,かつ;到とう,いた,いたる;双そう,ふた,たぐい,ならぶ,ふたつ;哲てつ,さとい,あきらか;喪そう,も;堅けん,かた,かたい,がた,がたい;床しょう,とこ,ゆか;括かつ,くく,くくる;弧こ;挑ちょう,いど,いどむ;掘くつ,ほ,ほる;揚よう,あ,あげる,あげ,あがる;握あく,にぎ,にぎる;揺よう,ゆ,ゆれる,ゆる,ゆらぐ,ゆるぐ,ゆする,ゆさぶる,ゆすぶる,うご,うごく;斎さい,とき,つつし,つつしむ,ものいみ,い,いむ,いわ,いわう,いつ,いつく;暫ざん,しばら,しばらく;析せき;枢すう,しゅ,とぼそ,からくり;軸じく;柄へい,がら,え,つか;泊はく,と,とまる,とめる;滑かつ,こつ,すべ,すべる,なめ,なめらか;潟せき,かた,がた;焦しょう,こ,こげる,こがす,こがれる,あせ,あせる;範はん;紛ふん,まぎ,まぎれる,まぎれ,まぎらす,まぎらわす,まぎらわしい;糾きゅう,ただ,ただす;綱こう,つな;網もう,あみ;肝かん,きも;芝し,しば;荒こう,あら,あらい,あ,あれる,あらす,あらし,すさ,すさむ;袋たい,だい,ふくろ;誰すい,だれ,たれ,た;珍ちん,めずら,めずらしい,たから;裂れつ,さ,さく,さける,ぎ,ぎれ;襲しゅう,おそ,おそう,かさ,かさね;貢こう,く,みつ,みつぐ;趣しゅ,おもむき,おもむ,おもむく;距きょ,へだ,へだたる,けづめ;籍せき;露ろ,ろう,つゆ;牧ぼく,まき;刷さつ,す,する,ず,ずり,は,はく;朗ろう,ほが,ほがらか,あき,あきらか;潮ちょう,しお,うしお;即そく,つ,つく,つける,すなわ,すなわち;垣えん,かき;威い,おど,おどす,おどし,おどかす;封ふう,ほう;筒とう,つつ;岳がく,たけ;慰い,なぐさ,なぐさめる,なぐさむ;懇こん,ねんご,ねんごろ;懲ちょう,こ,こりる,こらす,こらしめる;摩ま,まする,さす,さする,す,する;擦さつ,す,する,すれる,ず,ずれ,こす,こする,こすれる;撲ぼく;斉せい,さい,そろ,そろう,ひと,ひとしい,ひとしく,あたる,はやい;旨し,むね,うま,うまい;柔じゅう,にゅう,やわ,やわらか,やわらかい,やわら;沈ちん,じん,しず,しずむ,しずめる;沼しょう,ぬま;泰たい;滅めつ,ほろ,ほろびる,ほろぶ,ほろぼす;滋じ,し;炉ろ,いろり;琴きん,ごん,こと;寸すん;竜りゅう,りょう,ろう,たつ,いせ;縁えん,ねん,ふち,ふちど,ふちどる,ゆかり,よすが,へり,えにし;翼よく,つばさ;吉きち,きつ,よし;刃じん,にん,は,やいば,き,きる;忍にん,しの,しのぶ,しのばせる;桃とう,もも;辛しん,から,からい,つら,つらい,づら,づらい,かのと;謎めい,べい,なぞ;侍じ,し,さむらい,はべ,はべる;俺えん,おれ,われ;叱しつ,しち,しか,しかる;娯ご;斗と,とう;朱しゅ,あけ;丘きゅう,おか;梨り,なし;僕ぼく,しもべ;匹ひつ,ひき;叫きょう,さけ,さけぶ;釣ちょう,つ,つる,つり;髪はつ,かみ;嵐らん,あらし;涙るい,れい,なみだ;缶かん,かま;姫き,ひめ;棚ほう,たな,だな;粒りゅう,つぶ;砲ほう;雷らい,かみなり,いかずち,いかづち;芽が,め;塔とう;澄ちょう,す,すむ,すます;矛む,ぼう,ほこ;肌き,はだ;舟しゅう,ふね,ふな,ぶね;鐘しょう,かね;凶きょう;塊かい,け,かたまり,つちくれ;狩しゅ,か,かる,かり,が,がり;頃けい,きょう,ころ,ごろ,しばら,しばらく;魂こん,たましい,たま;脚きゃく,きゃ,かく,あし;井せい,しょう,い;呪じゅ,しゅ,しゅう,ず,まじな,まじなう,のろ,のろい,まじない,のろう;嬢じょう,むすめ;暦れき,りゃく,こよみ;曇どん,くも,くもる;眺ちょう,なが,ながめる;裸ら,はだか;賭と,か,かける,かけ;疲ひ,つか,つかれる,づか,づかれ,つからす;塾じゅく;卓たく;磨ま,みが,みがく,す,する;菌きん;陰いん,かげ,かげる;霊れい,りょう,たま;湿しつ,しゅう,しめ,しめる,しめす,うるお,うるおう,うるおす;硬こう,かた,かたい;稼か,かせ,かせぐ;嫁か,よめ,とつ,とつぐ,い,いく,ゆ,ゆく;溝こう,みぞ;滝ろう,そう,たき;狂きょう,くる,くるう,くるおしい,くるお;墨ぼく,すみ;穏おん,おだ,おだやか;鈍どん,にぶ,にぶい,にぶる,なま,なまる,なまく,なまくら;魔ま;寮りょう;盆ぼん;棟とう,むね,むな;斬ざん,さん,せん,ぜん,き,きる;寧ねい,むし,むしろ;椅い;歳さい,せい,とし,とせ,よわい;涼りょう,すず,すずしい,すずむ,すずやか,うす,うすい,ひや,ひやす,まことに;猿えん,さる;瞳どう,とう,ひとみ;鍵けん,かぎ;零れい,ぜろ,こぼ,こぼす,こぼれる;碁ご;租そ;幽ゆう,ふか,ふかい,かす,かすか,くら,くらい,しろ,しろい;泡ほう,あわ;癖へき,くせ,くせに;鍛たん,きた,きたえる;錬れん,ね,ねる;穂すい,ほ;帝てい,みかど;瞬しゅん,またた,またたく,まじろ,まじろぐ;菊きく;誇こ,ほこ,ほこる;阻そ,はば,はばむ;黙もく,ぼく,だま,だまる,もだ,もだす;俵ひょう,たわら;綿めん,わた;架か,かける,かかる;砕さい,くだ,くだく,くだける;粘ねん,ねば,ねばる;粧しょう;欺ぎ,あざむ,あざむく;詐さ,いつわ,いつわる;霧む,ぼう,ぶ,きり;柳りゅう,やなぎ;佐さ;尺しゃく;哀あい,あわ,あわれ,あわれむ,かな,かなしい;唇しん,くちびる;塀へい,べい;墜つい,お,おちる,おつ;如じょ,にょ,ごと,ごとし;婆ば,ばば,ばあ;崖がい,げ,ぎ,がけ,きし,はて;帽ぼう,もう,ずきん,おお,おおう;幣へい,ぬさ;恨こん,うら,うらむ,うらめしい;憎ぞう,にく,にくむ,にくい,にくらしい,にくしみ;憩けい,いこ,いこい,いこう;扇せん,おうぎ;扉ひ,とびら;挿そう,さ,さす,はさ,はさむ;掌しょう,てのひら,たなごころ;滴てき,しずく,したた,したたる;炊すい,た,たく,だ,だき;爽そう,あき,あきらか,さわ,さわやか,たがう;畳じょう,ちょう,たた,たたむ,たたみ,かさ,かさなる;瞭りょう,あきらか;箸ちょ,ちゃく,はし;胴どう;芯しん;虹こう,にじ;帳ちょう,とばり;蚊ぶん,か;蛇じゃ,だ,い,や,へび;貼てん,ちょう,は,はる,つ,つく;辱じょく,はずかし,はずかしめる;鉢はち,はつ;闇あん,おん,やみ,くら,くらい;隙げき,きゃく,けき,すき,す,すく,すかす,ひま;霜そう,しも;飢き,う,うえる;餓が,う,うえる;畜ちく;迅じん;騎き;蓄ちく,たくわ,たくわえる;尽じん,さん,つ,つくす,づ,づくし,つく,づく,ず,ずく,つきる,つかす,さかづき,ことごと,ことごとく,つか,つき;彩さい,いろど,いろどる;憶おく;溶よう,と,とける,とかす,とく;耐たい,た,たえる;踊よう,おど,おどる;賢けん,かしこ,かしこい;輝き,かがや,かがやく;脅きょう,おびや,おびやかす,おど,おどす,おどかす;麻ま,まあ,あさ;灯とう,ひ,ほ,ともしび,とも,ともす,あかり;咲しょう,さ,さく,ざき;培ばい,つちか,つちかう;悔かい,く,くいる,くやむ,くや,くやしい;脇きょう,わき,わけ;遂すい,と,とげる,つい,ついに;班はん;塗と,ぬ,ぬる,ぬり,まみ,まみれる;斜しゃ,なな,ななめ,はす;殴おう,なぐ,なぐる;盾じゅん,たて;穫かく;巾きん,ふく,おお,おおい,ちきり,きれ;駒く,こま;紫し,むらさき;抽ちゅう,ひき;誓せい,ちか,ちかう;悟ご,さと,さとる;拓たく,ひら,ひらく;拘こう,かか,かかわる;礎そ,いしずえ;鶴かく,つる;刈がい,かい,か,かる;剛ごう;唯ゆい,い,ただ;壇だん,たん;尼に,あま;概がい,おおむ,おおむね;浸しん,ひた,ひたす,ひたる,つ,つかる;淡たん,あわ,あわい;煮しゃ,に,にる,にえる,にやす;覆ふく,おお,おおう,くつがえ,くつがえす,くつがえる;謀ぼう,む,はか,はかる,たばか,たばかる,はかりごと;陶とう,すえ;隔かく,へだ,へだてる,へだたる;征せい;陛へい;俗ぞく;桑そう,くわ;潤じゅん,うるお,うるおう,うるおす,うる,うるむ;珠しゅ,たま;衰すい,おとろ,おとろえる;奨しょう,そう,すす,すすめる;劣れつ,おと,おとる;勘かん;妃ひ,きさき;丈じょう,たけ,だけ;峰ほう,みね,ね;巧こう,たく,たくみ,たくむ,うま,うまい;邪じゃ,よこし,よこしま;駄だ,た;唐とう,から;廷てい;鬱うつ,うっ,うっする,ふさ,ふさぐ,しげ,しげる;簿ぼ;彰しょう;漫まん,みだり,みだりに,そぞ,そぞろ;訂てい,ただ,ただす;諮し,はか,はかる;銘めい;堤てい,つつみ;漂ひょう,ただよ,ただよう;翻ほん,はん,ひるがえ,ひるがえる,ひるがえす;軌き;后こう,ご,きさき;奮ふん,ふる,ふるう;亭てい,ちん;仰ぎょう,こう,あお,あおぐ,おお,おおせ,お,おっしゃる,おっしゃ;伯はく;偶ぐう,たま;墳ふん;壮そう,さかん;把は,わ;搬はん;晶しょう;洞どう,ほら;涯がい,はて;疫えき,やく;孔こう,く,あな;偉い,えら,えらい;頂ちょう,いただ,いただく,いただき;召しょう,め,めす;挟きょう,しょう,はさ,はさむ,はさまる,わきばさ,わきばさむ,さしはさ,さしはさむ;枯こ,か,かれる,からす;沸ふつ,わ,わく,わかす;濯たく,すす,すすぐ,ゆす,ゆすぐ;燥そう,はしゃ,はしゃぐ;瓶びん,かめ;耕こう,たがや,たがやす;肯こう,がえんじ,がえんじる;脂し,あぶら;膚ふ,はだ;軒けん,のき;軟なん,やわ,やわらか,やわらかい;郊こう;隅ぐう,すみ;隻せき;邸てい,やしき;郡ぐん,こおり;釈しゃく,せき,とく,す,すてる,ゆる,ゆるす;肪ぼう;喚かん,わめ,わめく;媛えん,ひめ;貞てい,さだ;玄げん,くろ,くろい;苗びょう,みょう,なえ,なわ;渦か,うず;慈じ,いつく,いつくしむ;襟きん,えり;浦ほ,うら;塚ちょう,つか,づか;陥かん,おちい,おちいる,おとしい,おとしいれる;貫かん,つらぬ,つらぬく,ぬ,ぬく,ぬき;覇は,はく,はたがしら;呂ろ,りょ,せぼね;茨し,じ,いばら,かや,くさぶき;擁よう;孤こ;賠ばい;鎖さ,くさり,とざ,とざす;噴ふん,ふ,ふく;祥しょう,さいわ,さいわい,きざ,きざし,よ,よい,つまび,つまびらか;牲せい;秩ちつ;唆さ,そそ,そそる,そそのか,そそのかす;膨ぼう,ふく,ふくらむ,ふくれる;芳ほう,かんば,かんばしい;恒こう,つね,つねに;倫りん;陳ちん,ひ,ひねる;須す,しゅ,すべから,すべからく,すべし,ひげ,まつ,もち,もちいる,もと,もとめる;偏へん,かたよ,かたよる;遇ぐう,あ,あう;糧りょう,ろう,かて;殊しゅ,こと;慢まん;没ぼつ,もつ,おぼ,おぼれる,しず,しずむ,ない;怠たい,おこた,おこたる,なま,なまける;遭そう,あ,あう,あわせる;惰だ;猟りょう,かり,か,かる;寛かん,くつろ,くつろぐ,ひろ,ひろい,ゆる,ゆるやか;胞ほう;浄じょう,せい,きよ,きよめる,きよい;随ずい,まにま,まにまに,したが,したがう;稿こう,わら,したがき;丹たん,に;壌じょう,つち;舗ほ;騰とう,あが,あがる,のぼ,のぼる;緯い,よこいと,ぬき;艇てい;披ひ;錦きん,にしき;准じゅん;剰じょう,あまつさえ,あま,あまり,あまる;繊せん;諭ゆ,さと,さとす;惨さん,ざん,みじ,みじめ,いた,いたむ,むご,むごい;虐ぎゃく,しいた,しいたげる;据きょ,す,すえる,すわる;徐じょ,おもむ,おもむろに;搭とう;戴たい,いただ,いただく;帥すい;啓けい,ひら,ひらく,さと,さとす;鯨げい,くじら;荘そう,しょう,ちゃん,ほうき,おごそ,おごそか;栽さい;拐かい;冠かん,かんむり;勲くん,いさお;酬しゅう,しゅ,とう,むく,むくいる;紋もん;卸しゃ,おろ,おろす,おろし;欄らん,てすり;逸いつ,そ,それる,そらす,はぐ,はぐれる;尚しょう,なお;顕けん,あきらか,あらわ,あらわれる;粛しゅく,すく,つつし,つつしむ;愚ぐ,おろ,おろか;庶しょ;践せん,ふ,ふむ;呈てい;疎そ,しょ,うと,うとい,うとむ,まば,まばら;疾しつ,はや,はやい;謡よう,うた,うたい,うたう;鎌れん,けん,かま;酷こく,ひど,ひどい;叙じょ,つい,ついず,ついで;且しょ,そ,しょう,か,かつ;痴ち,し,しれる,おろか;哺ほ,はぐく,はぐくむ,ふく,ふくむ;傲ごう,おご,おごる,あなど,あなどる;茎けい,きょう,くき;悠ゆう;伏ふく,ふ,ふせる,ふす;鎮ちん,しず,しずめる,しずまる,おさえ;奉ほう,ぶ,たてまつ,たてまつる,まつ,まつる,ほうずる;憂ゆう,うれ,うれえる,うれい,う,うい,うき;朴ぼく,ほう,ほお,えのき;栃とち;惜せき,お,おしい,おしむ;佳か;悼とう,いた,いたむ;該がい;赴ふ,おもむ,おもむく;髄ずい;傍ぼう,かたわ,かたわら,わき,おか,はた,そば;累るい;癒ゆ,い,いえる,いや,いやす;郭かく,くるわ;尿にょう,ゆばり,いばり,しと;賓ひん;虜りょ,ろ,とりこ,とりく;憾かん,うら,うらむ;弥み,び,や,いや,いよ,いよいよ,わた,わたる;粗そ,あら,あらい;循じゅん;凝ぎょう,こ,こる,こらす,こご,こごらす,こごらせる,こごる;脊せき,せ,せい;旦たん,だん,あき,あきらか,あきら,ただし,あさ,あした;愉ゆ,たの,たのしい,たのしむ;抹まつ;栓せん;那な,だ,なに,なんぞ,いかん;拍はく,ひょう;猶ゆう,ゆ,なお;宰さい;寂じゃく,せき,さび,さびしい,さびれる,さみ,さみしい;縫ほう,ぬ,ぬう;呉ご,く,くれる,くれ;凡ぼん,はん,およ,およそ,おうよ,おうよそ,すべ,すべて;恭きょう,うやうや,うやうやしい;錯さく,しゃく;穀こく;陵りょう,みささぎ;弊へい;舶はく;窮きゅう,きょう,きわ,きわめる,きわまる,きわまり,きわみ;悦えつ,よろこ,よろこぶ,よろこばす;縛ばく,しば,しばる;轄かつ,くさび;弦げん,つる;窒ちつ;洪こう;摂せつ,しょう,おさ,おさめる,かね,かねる,と,とる;飽ほう,あ,あきる,あかす,あく;紳しん;庸よう;搾さく,しぼ,しぼる;碑ひ,いしぶみ;尉い,じょう;匠しょう,たくみ;賊ぞく;鼓こ,つづみ;旋せん,め,めぐる,いばり;腸ちょう,はらわた,わた;槽そう,ふね;伐ばつ,はつ,か,ぼち,き,きる,そむ,そむく,う,うつ;漬し,つ,つける,つかる,づ,づけ;坪へい,つぼ;紺こん;羅ら,うすもの;峡きょう,こう,はざま;俸ほう;醸じょう,かも,かもす;弔ちょう,とむら,とむらう,とぶら,とぶらう;乙おつ,いつ,おと,きのと;遍へん,あまね,あまねく;衡こう;款かん;閲えつ,けみ,けみする;喝かつ;敢かん,あ,あえて,あえない,あえず;膜まく;盲もう,めくら;胎たい;酵こう;堕だ,お,おちる,くず,くずす,くずれる;遮しゃ,さえぎ,さえぎる;凸とつ,でこ;凹おう,くぼ,くぼむ,へこ,へこむ,ぼこ;瑠る,りゅう;硫りゅう;赦しゃ;窃せつ,ぬす,ぬすむ,ひそ,ひそか;慨がい;扶ふ,たす,たすける;戯ぎ,げ,たわむ,たわむれる,ざ,ざれる,じゃ,じゃれる;忌き,い,いむ,いみ,いまわしい;濁だく,じょく,にご,にごる,にごす;奔ほん,はし,はしる;肖しょう,あやか,あやかる;朽きゅう,く,くちる;殻かく,こく,ばい,から,がら;享きょう,こう,う,うける;藩はん;媒ばい,なこうど;鶏けい,にわとり,とり;嘱しょく,しょくする,たの,たのむ;迭てつ;椎つい,すい,つち,う,うつ;絹けん,きぬ;陪ばい;剖ぼう;譜ふ;淑しゅく,しと,しとやか;帆はん,ほ;憤ふん,いきどお,いきどおる;酌しゃく,く,くむ;暁ぎょう,きょう,あかつき,さと,さとる;傑けつ,すぐ,すぐれる;錠じょう;璃り;遷せん,うつ,うつる,うつす,みやこがえ;拙せつ,つたな,つたない;峠とうげ;篤とく,あつ,あつい;叔しゅく;雌し,め,めす,めん;堪かん,たん,た,たえる,たま,たまる,こら,こらえる,こた,こたえる;吟ぎん;甚じん,はなは,はなはだ,はなはだしい;崇すう,あが,あがめる;漆しつ,うるし;岬こう,みさき;紡ぼう,つむ,つむぐ;礁しょう;屯とん,たむろ;姻いん;擬ぎ,まが,まがい,もど,もどき;睦ぼく,もく,むつ,むつまじい,むつむ,むつぶ;閑かん;曹そう,ぞう;詠えい,よ,よむ,うた,うたう;卑ひ,いや,いやしい,いやしむ,いやしめる;侮ぶ,あなど,あなどる,あなず,あなずる;鋳ちゅう,い,しゅ,しゅう,いる;蔑べつ,ないがしろ,なみ,なみする,くらい,さげす,さげすむ;胆たん,きも;浪ろう;禍か,わざわい;酪らく;憧しょう,とう,どう,あこが,あこがれる;慶けい,よろこ,よろこび;亜あ,つ,つぐ;汰た,たい,おご,おごる,にご,にごる,よな,よなげる;沙さ,しゃ,すな,よなげる;逝せい,ゆ,ゆく,い,いく;匿とく,かくま,かくまう;寡か;痢り;坑こう;藍らん,あい;畔はん,あぜ,くろ,ほとり;唄ばい,うた,うたう;拷ごう;渓けい,たに,たにがわ;廉れん;謹きん,つつし,つつしむ;湧ゆう,よう,ゆ,わ,わく;醜しゅう,みにく,みにくい,しこ;升しょう,ます;殉じゅん;煩はん,ぼん,わずら,わずらう,わずらわす,うるさ,うるさがる,うるさい;劾がい;桟さん,せん,かけはし;婿せい,むこ;慕ぼ,した,したう;罷ひ,まか,まかり,や,やめる;矯きょう,た,ためる;某ぼう,それがし,なにがし;囚しゅう,とら,とらわれる;泌ひつ,ひ;漸ぜん,ようや,ようやく,やや,ようよ,ようよう,すす,すすむ;藻そう,も;妄もう,ぼう,みだ,みだりに;蛮ばん,えびす;倹けん,つま,つましい,つづまやか;挨あい,ひら,ひらく;宛えん,あ,あてる,あて,づつ,あたか,あたかも;畏い,おそ,おそれる,かしこま,かしこまる,かしこ,かしこし;萎い,な,しお,しおれる,しな,しなびる,しぼ,しぼむ,なえる;壱いち,いつ,ひとつ;咽いん,えん,えつ,むせ,むせぶ,むせる,のど,の,のむ;淫いん,ひた,ひたす,ほしいまま,みだ,みだら,みだれる,みだり;韻いん;臼きゅう,ぐ,うす,うすづ,うすづく;餌じ,に,え,えば,えさ,もち;謁えつ;怨えん,おん,うん,うら,うらむ,うらみ,うらめしい;艶えん,つや,なま,なまめかしい,あで,あでやか,つやめく,なまめく;旺おう,きょう,ごう,かがや,かがやき,うつくし,うつくしい,さかん;翁おう,おきな;臆おく,よく,むね,おくする;箇か,こ;苛か,いじ,いじめる,さいな,さいなむ,いらだ,いらだつ,からい,こまかい;蓋がい,かい,こう,ふた,けだ,けだし,おお,おおう,かさ,かこう;骸がい,かい,むくろ;柿し,かき;嚇かく,おど,おどす;顎がく,あご,あぎと;葛かつ,かち,つづら,くず;褐かつ;釜ふ,かま;瓦が,かわら,ぐらむ;棺かん;玩がん,もちあそ,もちあそぶ,もてあそ,もてあそぶ;畿き,みやこ;僅きん,ごん,わず,わずか;斤きん;虞ぐ,おそれ,おもんぱか,おもんぱかる,はか,はかる,うれ,うれえる,あざむ,あざむく,あやま,あやまる,のぞ,のぞむ,たの,たのしむ;串かん,けん,せん,くし,つらぬ,つらぬく;窟くつ,こつ,いわや,いはや,あな;薫くん,かお,かおる;稽けい,かんが,かんがえる,とど,とどめる;詣けい,げい,けいする,まい,まいる,いた,いたる,もう,もうでる;桁こう,けた;舷げん,ふなばた,ふなべり;股こ,また,もも;乞こつ,きつ,き,きけ,こち,こ,こう;侯こう;勾こう,く,かぎ,ま,まがる;喉こう,のど;慌こう,あわ,あわてる,あわただしい;梗こう,きょう,ふさぐ,やまにれ,おおむね;墾こん,は,はる,ひら,ひらく;痕こん,あと;挫ざ,さ,くじ,くじく,くじける;塞そく,さい,ふさ,ふさぐ,とりで,み,みちる;采さい,と,とる,いろどり;柵さく,さん,しがら,しがらむ,しがらみ,とりで,やらい;拶さつ,せま,せまる;蚕さん,てん,かいこ,こ;嗣し;肢し;賜し,たまわ,たまわる,たま,たまう,たも,たもう;璽じ;嫉しつ,そね,そねむ,ねた,ねたむ,にく,にくむ;爵しゃく;腫しゅ,しょう,は,はれる,はれ,はらす,く,くむ,はれもの;儒じゅ;愁しゅう,うれ,うれえる,うれい;蹴しゅく,しゅう,け,ける;遵じゅん;宵しょう,よい;抄しょう;硝しょう;詔しょう,みことのり;拭しょく,しき,ぬぐ,ぬぐう,ふ,ふく;薪しん,たきぎ,まき;腎じん;裾きょ,こ,すそ;畝ぼう,ほ,も,む,せ,うね;凄せい,さい,さむ,さむい,すご,すごい,すさ,すさまじい;醒せい,さ,さます,さめる;戚そく,せき,いた,いたむ,うれ,うれえる,みうち;斥せき,しりぞ,しりぞける;煎せん,せんじる,い,いる,に,にる;羨せん,えん,うらや,うらやむ,あまり;腺せん;詮せん,せんずる,かい,あき,あきらか;繕ぜん,つくろ,つくろう;膳ぜん,せん,かしわ,すす,すすめる,そな,そなえる;塑そ,でく;曽そう,そ,ぞう,かつ,かつて,すなわち;遡そ,さく,さかのぼ,さかのぼる;痩そう,ちゅう,しゅう,しゅ,や,やせる;捉そく,さく,とら,とらえる;袖しゅう,そで;唾だ,た,つば,つばき;堆たい,つい,うずたか,うずたかい;但たん,ただ,ただし;綻たん,ほころ,ほころびる;逐ちく;嫡ちゃく,てき;衷ちゅう;勅ちょく,いまし,いましめる,みことのり;捗ちょく,ほ,はかど,はかどる;朕ちん;潰かい,え,つぶ,つぶす,つぶれる,つい,ついえる;諦てい,たい,あきら,あきらめる,つまびらか,まこと;逓てい,かわ,かわる,たがいに;溺でき,じょう,にょう,いばり,おぼ,おぼれる;妬と,つ,ねた,ねたむ,そね,そねむ,つも,つもる,ふさ,ふさぐ;痘とう;謄とう;頓とん,とつ,にわか,にわかに,とんと,つまず,つまずく,とみ,とみに,ぬかずく;弐に,じ,ふた,ふたつ,そえ;匂にお,におう,におい,におわせる;捻ねん,じょう,ね,ねじる,ねじ,ひね,ひねくる,ひねる;罵ば,ののし,ののしる;剥はく,ほく,へ,へぐ,へず,へずる,む,むく,むける,は,はがれる,はぐ,はげる,はがす;斑はん,ふ,まだら;氾はん,ひろ,ひろがる;汎はん,ぶ,ふう,ほう,ほん,ただよ,ただよう,ひろ,ひろい;頒はん,わか,わかつ;眉び,み,まゆ;膝しつ,ひざ;肘ちゅう,ひじ;賦ふ,ぶ;附ふ,つ,つける,つく;丙へい,ひのえ;蔽へい,へつ,ふつ,おお,おおう,おおい;倣ほう,なら,ならう;貌ぼう,ばく,かたち,かたどる;勃ぼつ,ほつ,おこ,おこる,にわかに;昧まい,ばい,くら,くらい,むさぼ,むさぼる;繭けん,まゆ,きぬ;冥めい,みょう,くら,くらい;麺めん,べん,むぎこ;耗もう,こう;餅へい,ひょう,もち,もちい;冶や,い,いる;妖よう,あや,あやしい,なま,なまめく,わざわ,わざわい;窯よう,かま;沃よう,よく,おく,そそ,そそぐ;濫らん,みだ,みだりに,みだりがましい;吏り;侶りょ,ろ,とも;厘りん;弄ろう,る,いじく,いじくる,ろうする,いじ,いじる,ひねく,ひねくる,たわむ,たわむれる,もてあそ,もてあそぶ;楼ろう,たかどの;麓ろく,ふもと;刹せち,せつ,さつ;喩ゆ,たと,たとえる,さと,さとす;嗅きゅう,か,かぐ;嘲ちょう,とう,あざけ,あざける;毀き,こぼ,こぼつ,こわ,こわす,こぼれる,こわれる,そし,そしる,やぶ,やぶる;彙い,はりねずみ;恣し,ほしいまま;惧く,ぐ,おそ,おそれる;慄りつ,ふる,ふるえる,おそ,おそれる,おのの,おののく;憬けい,あこが,あこがれる;拉らつ,ら,ろう,らっ,らっする,ひし,ひしぐ,くだ,くだく;摯し,いた,いたる;曖あい,くら,くらい;楷かい;璧へき,たま;瘍よう,かさ;箋せん,ふだ;籠ろう,る,かご,こ,こめる,こも,こもる,こむ;緻ち,こまか,こまかい;羞しゅう,はじ,はじる,すすめ,すすめる,は,はずかしい;訃ふ,しらせ;諧かい,かな,かなう,やわ,やわらぐ;貪たん,どん,とん,むさぼ,むさぼる;踪そう,しょう,あと;辣らつ,から,からい;錮こ,ふさ,ふさぐ;塡てん,ちん,はま,はまる,うず,うずめる,は,はめる,ふさ,ふさぐ;頰きょう,ほお,ほほ".split(";").forEach(en => { const k = [...en][0]; YOMI[k] = en.slice(k.length).split(","); });
+const DAKU = {か:"が",き:"ぎ",く:"ぐ",け:"げ",こ:"ご",さ:"ざ",し:"じ",す:"ず",せ:"ぜ",そ:"ぞ",た:"だ",ち:"ぢ",つ:"づ",て:"で",と:"ど",は:"ば",ひ:"び",ふ:"ぶ",へ:"べ",ほ:"ぼ"};
+const HANDAKU = {は:"ぱ",ひ:"ぴ",ふ:"ぷ",へ:"ぺ",ほ:"ぽ"};
+// 熟語の中でよく使う読み（データにないもの）を補う
+[["日","に"],["文","も"],["語","がたり"],["城","き"],["良","ら"],["皇","のう"],["応","のう"],["観","のん"]].forEach(([k,r]) => { if (YOMI[k] && !YOMI[k].includes(r)) YOMI[k].push(r); });
+function yomiVariants(r, first, last){
+  const v = new Set();
+  const add = x => { v.add(x); if (!last && /[つくちき]$/.test(x)) v.add(x.slice(0,-1) + "っ"); };
+  add(r);
+  if (!first){
+    const c = r[0];
+    if (DAKU[c]) add(DAKU[c] + r.slice(1));
+    if (HANDAKU[c]) add(HANDAKU[c] + r.slice(1));
+    if (c === "ち") add("じ" + r.slice(1));
+    if (c === "つ") add("ず" + r.slice(1));
+  }
+  return [...v];
+}
+function splitPerKanji(kanjis, y){
+  if (!y || kanjis.length < 2 || !kanjis.every(k => YOMI[k])) return null;
+  const memo = new Map();
+  const go = (i, pos) => {
+    if (i === kanjis.length) return pos === y.length ? [] : null;
+    const key = i + "," + pos; if (memo.has(key)) return memo.get(key);
+    const cands = new Set();
+    YOMI[kanjis[i]].forEach(r => yomiVariants(r, i === 0, i === kanjis.length - 1).forEach(x => cands.add(x)));
+    let res = null;
+    for (const c of [...cands].sort((a,b) => b.length - a.length)){
+      if (y.startsWith(c, pos)){ const rest = go(i+1, pos + c.length); if (rest){ res = [c, ...rest]; break; } }
+    }
+    memo.set(key, res); return res;
+  };
+  return go(0, 0);
+}
+// ことばをマス用の単位に分ける（漢字は1字1マス。かなは設定により1マスに2字まで）
+function otehonTokens(w){
+  const chars = [...w], toks = [];
+  for (let i=0; i<chars.length; i++){
+    const c = chars[i];
+    if (isKanji(c)){ toks.push({c, k:true}); continue; }
+    if (state.okana2 && i+1 < chars.length && !isKanji(chars[i+1])){ toks.push({c: c + chars[i+1], k:false}); i++; }
+    else toks.push({c, k:false});
+  }
+  return toks;
+}
+function otehonFlow(){
+  const L = otehonLayout(), words = parseOtehon().filter(w => w.w);
+  const cells = []; const rubies = []; let p = 0, placed = 0, repeats = 0;
+  const place = (wd, rep) => {
+    const toks = otehonTokens(wd.w); if (!toks.length) return;
+    if (state.onewcol && p % L.R !== 0) p += L.R - (p % L.R);
+    const runs = [], kcells = []; let cur = null;
+    toks.forEach(t => {
+      if (t.k){ if (!cur){ cur = []; runs.push(cur); } cur.push(p); kcells.push(p); } else cur = null;
+      cells[p] = {c: t.c, rep}; p++;
+    });
+    if (wd.y && runs.length){
+      const sep = wd.y.split("・").filter(Boolean);
+      if (sep.length > 1 && sep.length === kcells.length){
+        // 1字ずつ：起承転結 → き／しょう／てん／けつ
+        kcells.forEach((pos, i) => rubies.push({cells: [pos], text: sep[i], rep}));
+      } else if (sep.length > 1 && sep.length === runs.length){
+        runs.forEach((run, i) => rubies.push({cells: run, text: sep[i], rep}));
+      } else {
+        const yy = sep.join("");
+        let parts = splitReading(wd.w, yy);
+        if (parts.length !== runs.length) parts = [yy];
+        runs.forEach((run, i) => {
+          if (!parts[i]) return;
+          // 熟語は、できるだけ1字ずつのよみに分ける（起承転結 → き／しょう／てん／けつ）
+          const per = (parts.length === runs.length) ? splitPerKanji(run.map(pos => cells[pos].c), parts[i]) : null;
+          if (per) run.forEach((pos, j) => rubies.push({cells: [pos], text: per[j], rep}));
+          else rubies.push({cells: run, text: parts[i], rep});
+        });
+      }
+    }
+  };
+  const need = wd => {           // そのことばを置くと何マス進むか
+    const n = otehonTokens(wd.w).length;
+    const pad = (state.onewcol && p % L.R !== 0) ? L.R - (p % L.R) : 0;
+    return pad + n;
+  };
+  words.forEach(wd => { place(wd, false); placed++; });
+  // マスがあまったら、最初のことばから くり返して ページの終わりまでうめる
+  if (state.ofill && words.length && p % L.per !== 0){
+    const pageEnd = Math.ceil(p / L.per) * L.per;
+    let i = 0, guard = 0;
+    while (guard++ < 5000){
+      const wd = words[i % words.length];
+      if (p + need(wd) > pageEnd) break;
+      place(wd, true); i++;
+    }
+    repeats = i;
+  }
+  const total = Math.max(1, Math.ceil(p / L.per));
+  return {L, cells, rubies, total, used: p, words: words.length, repeats};
+}
+function otehonPages(){
+  const F = otehonFlow(), out = [];
+  for (let i=0;i<F.total;i++) out.push({otehon:true, items:[1], idx:i, total:F.total, answer:false, flow:F});
+  return out;
+}
+const SMALL_K = "ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ";
+const ROTATE_K = "ー－～〜…‥（）()「」『』";
+// かな1字をマスの中に書く（小さい字は右上、のばし棒などは縦向き）
+function kanaText(ctx, c, cx, cy, size, cellH, color){
+  if (SMALL_K.includes(c)){ centerText(ctx, c, cx + size*0.28, cy - Math.min(size, cellH)*0.26, size*0.78, color); return; }
+  if (ROTATE_K.includes(c)){
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(Math.PI/2);
+    centerText(ctx, c, 0, 0, size, color); ctx.restore(); return;
+  }
+  if ("、。，．".includes(c)){ centerText(ctx, c, cx + size*0.32, cy - size*0.32, size, color); return; }
+  centerText(ctx, c, cx, cy, size, color);
+}
+function drawOtehon(ctx, pg){
+  const F = pg.flow, L = F.L, s = L.s, rw = s * L.r, colW = s + rw;
+  const gridW = L.C * colW, gridH = L.R * s;
+  const left = OTE.x0 + ((OTE.x1 - OTE.x0) - gridW)/2, top = OTE.y0;
+  const right = left + gridW;
+  const LINE = "#7cc8ea", DASH = "#b5e0f4";
+  const baseColor = state.ocolor === "gray" ? "#c3c9ce" : "#141a1f";
+  // 上の欄：タイトル・日づけ・なまえ（なまえは右）
+  ctx.font = `600 4.6px ${FONT}`; ctx.fillStyle = "#1d2328"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  const title = (state.otitle || "お手本").slice(0, 16);
+  ctx.fillText(title, left, top - 6);
+  const tw = ctx.measureText(title).width || title.length*4.6;
+  ctx.font = `400 3.6px ${SANS}`; ctx.fillStyle = "#4a5560";
+  ctx.fillText("　　がつ　　にち（　　）", left + tw + 6, top - 6);
+  ctx.textAlign = "right"; ctx.fillText(`${pg.idx+1}/${pg.total}`, right, 292);
+  ctx.textAlign = "left"; ctx.fillStyle = "#1d2328"; ctx.font = `600 3.8px ${SANS}`;
+  const nameX = right - 62; ctx.fillText("なまえ", nameX, top - 6);
+  ctx.strokeStyle = "#4a5560"; ctx.lineWidth = 0.3; ctx.beginPath(); ctx.moveTo(nameX + 13, top - 5.2); ctx.lineTo(right, top - 5.2); ctx.stroke();
+  // マス目
+  for (let col=0; col<L.C; col++){
+    const xr = right - col*colW;            // この列の右はし
+    const cellX = xr - rw - s;              // マス（読みがな欄はマスの右）
+    for (let row=0; row<L.R; row++){
+      const y = top + row*s;
+      if (state.cross){
+        ctx.save(); ctx.strokeStyle = DASH; ctx.lineWidth = 0.2; ctx.setLineDash([0.9,0.9]);
+        ctx.beginPath(); ctx.moveTo(cellX + s/2, y + 0.3); ctx.lineTo(cellX + s/2, y + s - 0.3);
+        ctx.moveTo(cellX + 0.3, y + s/2); ctx.lineTo(cellX + s - 0.3, y + s/2); ctx.stroke(); ctx.restore();
+      }
+      ctx.strokeStyle = LINE; ctx.lineWidth = 0.28; ctx.strokeRect(cellX, y, s, s);
+      if (rw){ ctx.strokeRect(cellX + s, y, rw, s); }
+    }
+  }
+  ctx.strokeStyle = LINE; ctx.lineWidth = 0.9; ctx.strokeRect(left, top, gridW, gridH);
+  const cellPos = i => {
+    const local = i - pg.idx * L.per;
+    const col = Math.floor(local / L.R), row = local % L.R;
+    const xr = right - col*colW;
+    return {x: xr - rw - s, y: top + row*s, col, row};
+  };
+  const start = pg.idx * L.per, end = start + L.per;
+  for (let i=start; i<end && i<F.cells.length; i++){
+    const cell = F.cells[i]; if (!cell) continue;
+    const c = cell.c, q = cellPos(i);
+    const color = (cell.rep && state.orepLight) ? "#c3c9ce" : baseColor;
+    const ch = [...c];
+    if (ch.length === 1 && isKanji(c)) centerText(ctx, c, q.x + s/2, q.y + s/2, s*0.78, color);
+    else if (ch.length === 1) kanaText(ctx, c, q.x + s/2, q.y + s/2, s*0.66, s, color);
+    else {   // 1マスに2字：上下に半分ずつ
+      kanaText(ctx, ch[0], q.x + s/2, q.y + s*0.27, s*0.42, s/2, color);
+      kanaText(ctx, ch[1], q.x + s/2, q.y + s*0.73, s*0.42, s/2, color);
+    }
+  }
+  if (rw){
+    F.rubies.forEach(rb => {
+      const segs = []; let curSeg = null;
+      rb.cells.forEach(i => { const col = Math.floor(i / L.R); if (!curSeg || curSeg.col !== col){ curSeg = {col, cells:[]}; segs.push(curSeg); } curSeg.cells.push(i); });
+      const chars = [...rb.text], N = rb.cells.length; let used = 0, acc = 0;
+      segs.forEach((sg, k) => {
+        acc += sg.cells.length;
+        const upto = k === segs.length-1 ? chars.length : Math.round(chars.length * acc / N);
+        const text = chars.slice(used, upto).join(""); used = upto;
+        if (!text || sg.cells[0] < start || sg.cells[0] >= end) return;
+        const a = cellPos(sg.cells[0]), b = cellPos(sg.cells[sg.cells.length-1]);
+        const span = (b.y + s) - a.y, len = [...text].length;
+        let rs = Math.min(rw * 0.72, s * 0.3);
+        let step = Math.min(rs * 1.06, span / len);
+        if (step < rs) rs = step / 1.02;
+        vText(ctx, text, a.x + s + rw/2, a.y + (span - step*len)/2, rs, (rb.rep && state.orepLight) || baseColor !== "#141a1f" ? "#c3c9ce" : "#1d2328", step);
+      });
+    });
+  }
+}
+
+// ---------- 画面（UI） ----------
+const PREF_KEY = "kanjiApp:v1:prefs";
+(function loadPrefs(){
+  try {
+    const p = JSON.parse(store.get(PREF_KEY));
+    if (p){
+      ["tsrc","ctext","ctitle","tsys","grade","term","mode","qn","limit","pword","write","ans","size","order","trace","cross","otext","otitle","orows","ocols","oruby","ocolor","onewcol","orepeat","ofill","orepLight","okana2","ogrid","ofrom"].forEach(k => { if (p[k] !== undefined) state[k] = p[k]; });
+      // 以前の版で保存された「ことばごとに次の列から」を、漢字帳どおりの続け書きに戻す
+      if (p.orepeat === undefined || !p.prefVer){ state.onewcol = false; state.orepeat = false; }
+      if ((p.prefVer || 0) < 3){ state.orows = 10; state.ocols = 5; state.ogrid = "10x5"; }
+      state.orepLight = false;
+      if ((p.prefVer || 0) < 4){ state.ofill = true; state.orepLight = false; state.okana2 = false; }
+    }
+  } catch(e){}
+})();
+function savePrefs(){ const {page, ...p} = state; p.prefVer = 4; store.set(PREF_KEY, JSON.stringify(p)); }
+
+let toastTimer = null;
+function toast(text){ const t = $("toast"); t.textContent = text; t.classList.add("on"); clearTimeout(toastTimer); toastTimer = setTimeout(()=>t.classList.remove("on"), 2600); }
+
+// 学年
+function buildGrades(){
+  const g = $("grades");
+  for (let i=1;i<=6;i++){
+    const b = document.createElement("button");
+    b.type = "button"; b.setAttribute("role","radio"); b.dataset.g = i;
+    b.innerHTML = `<span class="gy"><span class="gn">${i}</span><span class="gl">年生</span></span><small>${KANJI[i].length}字</small>`;
+    b.setAttribute("aria-label", `${i}年生（${KANJI[i].length}字）`);
+    b.onclick = () => { state.grade = i; state.page = 0; update({grade:true}); };
+    g.appendChild(b);
+  }
+}
+// 学期
+function buildTerms(){
+  const box = $("terms");
+  box.innerHTML = "";
+  const defs = state.tsys === "2" ? [["1","前期","4〜9月"],["2","後期","10〜3月"],["0","1年間","ぜんぶ"]] : [["1","1学期","4〜7月"],["2","2学期","9〜12月"],["3","3学期","1〜3月"],["0","1年間","ぜんぶ"]];
+  box.classList.toggle("two", state.tsys === "2");
+  defs.forEach(([v,name,mo]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "term"; b.setAttribute("role","radio"); b.dataset.v = v;
+    b.innerHTML = `${v!=="0"?'<span class="bar"></span>':''}<b>${name}</b><span class="mo">${mo}</span><span class="st"></span>`;
+    b.onclick = () => {
+      state.term = v; state.page = 0;
+      if (v !== "0" && !terms(state.grade).lists[Number(v)-1].length){ update(); openSheet(v); return; }
+      update();
+    };
+    box.appendChild(b);
+  });
+}
+// セグメント類
+document.querySelectorAll("[data-key]").forEach(group => {
+  group.querySelectorAll("[data-v]").forEach(b => {
+    b.type = "button"; if (!b.getAttribute("role")) b.setAttribute("role","radio");
+    b.onclick = () => {
+      state[group.dataset.key] = b.dataset.v; state.page = 0;
+      if (group.dataset.key === "tsys"){ if (state.tsys === "2" && state.term === "3") state.term = "0"; buildTerms(); }
+      if (group.dataset.key === "ogrid"){ if (b.dataset.v !== "custom"){ const [r,c] = b.dataset.v.split("x").map(Number); state.orows = r; state.ocols = c; } else setTimeout(() => $("orows").focus(), 0); }
+      update();
+    };
+  });
+});
+$("trace").onchange = e => { state.trace = e.target.checked; update(); };
+$("cross").onchange = e => { state.cross = e.target.checked; update(); };
+$("pword").onchange = e => { state.pword = e.target.checked; update(); };
+// お手本の入力
+let oteTimer = null, cusTimer = null;
+$("ctext").addEventListener("input", e => { state.ctext = e.target.value; clearTimeout(cusTimer); cusTimer = setTimeout(() => { state.page = 0; update({fromInput:true}); }, 250); });
+$("ctitle").addEventListener("input", e => { state.ctitle = e.target.value; clearTimeout(cusTimer); cusTimer = setTimeout(() => update({fromInput:true}), 250); });
+// ことば・よみの入力欄（1行ずつ）
+const READ_DICT = {};
+for (let g=1; g<=6; g++) JUKU[g].forEach(([t,w,y]) => { if (!READ_DICT[w]) READ_DICT[w] = y; });
+let wRows = [];
+function rowsFromText(){
+  const r = String(state.otext || "").split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(l => {
+    const m = l.match(/^(\S+?)(?:[\s　:：、,，]+(.+))?$/); return m ? {w:m[1], y:(m[2]||"").trim()} : {w:l, y:""};
+  });
+  return r.length ? r : [{w:"", y:""}];
+}
+function rowsToText(){ state.otext = wRows.filter(r => r.w.trim()).map(r => r.w.trim() + (r.y.trim() ? " " + r.y.trim() : "")).join("\n"); }
+function commitRows(){ rowsToText(); clearTimeout(oteTimer); oteTimer = setTimeout(() => { state.page = 0; update({fromInput:true}); }, 200); }
+function renderRows(focus){
+  const box = $("wlist"); box.innerHTML = "";
+  wRows.forEach((r, i) => {
+    const row = document.createElement("div"); row.className = "wrow"; row.setAttribute("role","listitem");
+    row.dataset.i = i;
+    row.innerHTML = `<span class="handle" title="ドラッグで順番を入れかえ" aria-hidden="true">⋮⋮</span><span class="no">${i+1}</span><input class="w" type="text" aria-label="${i+1}番目のことば" placeholder="例：学校" autocomplete="off" spellcheck="false"><input class="y" type="text" aria-label="${i+1}番目のよみ" placeholder="がっこう" autocomplete="off" spellcheck="false" inputmode="kana"><button class="del" type="button" aria-label="${i+1}番目を消す">×</button>`;
+    const wi = row.querySelector(".w"), yi = row.querySelector(".y");
+    wi.value = r.w; yi.value = r.y; if (r.auto) yi.classList.add("auto");
+    wi.addEventListener("input", () => { r.w = wi.value; const d = READ_DICT[r.w.trim()]; if ((!r.y || r.auto) && d){ r.y = d; r.auto = true; yi.value = d; yi.classList.add("auto"); } else if (r.auto && !d){ r.y = ""; r.auto = false; yi.value = ""; yi.classList.remove("auto"); } commitRows(); });
+    yi.addEventListener("input", () => { r.y = yi.value; r.auto = false; yi.classList.remove("auto"); commitRows(); });
+    wi.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.isComposing){ e.preventDefault(); yi.focus(); yi.select(); }
+      if (e.key === "Backspace" && !wi.value && !yi.value && wRows.length > 1){ e.preventDefault(); wRows.splice(i,1); commitRows(); renderRows({i: Math.max(0,i-1), f:"y"}); }
+    });
+    yi.addEventListener("keydown", e => {
+      if (e.key === "Enter" && !e.isComposing){ e.preventDefault(); if (i === wRows.length-1) wRows.push({w:"", y:""}); renderRows({i: i+1, f:"w"}); }
+    });
+    wi.addEventListener("paste", e => {
+      const t = (e.clipboardData || window.clipboardData).getData("text");
+      if (!/\n/.test(t)) return;
+      e.preventDefault();
+      const save = state.otext; state.otext = t; const add = rowsFromText(); state.otext = save;
+      add.forEach(a => { if (!a.y && READ_DICT[a.w]){ a.y = READ_DICT[a.w]; a.auto = true; } });
+      wRows.splice(i, (r.w || r.y) ? 0 : 1, ...add); commitRows(); renderRows({i: i + add.length - 1, f:"w"});
+    });
+    row.querySelector(".del").onclick = () => { wRows.splice(i,1); if (!wRows.length) wRows.push({w:"", y:""}); commitRows(); renderRows({i: Math.min(i, wRows.length-1), f:"w"}); };
+    box.appendChild(row);
+  });
+  if (focus){ const row = box.children[focus.i]; if (row){ const el = row.querySelector(focus.f === "y" ? ".y" : ".w"); el.focus(); } }
+}
+$("wAdd").onclick = () => { wRows.push({w:"", y:""}); renderRows({i: wRows.length-1, f:"w"}); };
+// 学期の漢字からお手本に入れる
+function fillTermSelects(){
+  const gs = $("oteGrade"), ts = $("oteTerm"), g0 = Number(gs.value) || state.grade, t0 = ts.value;
+  gs.innerHTML = [1,2,3,4,5,6].map(g => `<option value="${g}">${g}年生</option>`).join(""); gs.value = g0;
+  const T = terms(g0), ids = termIds();
+  ts.innerHTML = ids.map(t => `<option value="${t}">${tName(t)}（${T.lists[t-1].length ? T.lists[t-1].length + "字" : "未設定"}）</option>`).join("") + `<option value="0">1年間（${KANJI[g0].length}字）</option>`;
+  ts.value = [...ts.options].some(o => o.value === t0) ? t0 : (ids.find(t => T.lists[t-1].length) ? String(ids.find(t => T.lists[t-1].length)) : "0");
+  termInfo();
+}
+function termRows(){
+  const g = Number($("oteGrade").value), t = $("oteTerm").value;
+  const list = t === "0" ? [...KANJI[g]] : terms(g).lists[Number(t)-1];
+  if ((state.ofrom || "word") === "kanji") return list.map(c => ({w:c, y:""}));
+  const rows = [], seen = new Set();
+  list.forEach(c => { const wd = WORD[c]; if (!wd || seen.has(wd.w)) return; seen.add(wd.w); rows.push({w: wd.w, y: wd.y, auto:true}); });
+  return rows;
+}
+function termInfo(){
+  const r = termRows(), t = $("oteTerm").value;
+  $("wTermInfo").textContent = r.length ? `${r.length}こ 入ります（例：${r.slice(0,4).map(x => x.w).join("・")}${r.length > 4 ? "…" : ""}）` : "この範囲の漢字はまだ設定されていません。「漢字テスト」などの画面で、学期の漢字を設定してください。";
+  $("wTermReplace").disabled = $("wTermAppend").disabled = !r.length;
+}
+$("wTermBtn").onclick = () => {
+  const p = $("wTerm"), open = p.hidden; p.hidden = !open; $("wTermBtn").setAttribute("aria-expanded", String(open));
+  if (open){ $("wBulk").hidden = true; $("oteGrade").value = state.grade; fillTermSelects(); }
+};
+$("oteGrade").onchange = fillTermSelects;
+$("oteTerm").onchange = termInfo;
+document.querySelectorAll('[data-key="ofrom"] [data-v]').forEach(b => b.addEventListener("click", () => setTimeout(termInfo, 0)));
+$("wTermReplace").onclick = () => { const add = termRows(); wRows = add.length ? add : [{w:"", y:""}]; commitRows(); renderRows(); $("wTerm").hidden = true; $("wTermBtn").setAttribute("aria-expanded","false"); toast(`${add.length}こ 入れました`); };
+$("wTermAppend").onclick = () => { const add = termRows(); wRows = wRows.filter(r => r.w.trim()).concat(add); if (!wRows.length) wRows = [{w:"", y:""}]; commitRows(); renderRows(); $("wTerm").hidden = true; $("wTermBtn").setAttribute("aria-expanded","false"); toast(`${add.length}こ 追加しました`); };
+$("wClear").onclick = () => { if (!confirm("入力したことばをぜんぶ消しますか？")) return; wRows = [{w:"", y:""}]; commitRows(); renderRows({i:0, f:"w"}); };
+wRows = rowsFromText();
+$("otitle").addEventListener("input", e => { state.otitle = e.target.value; clearTimeout(oteTimer); oteTimer = setTimeout(() => update({fromInput:true}), 250); });
+const LIM = {orows:[3,20], ocols:[1,12]};
+function setDim(id, v){ const [a,b] = LIM[id]; v = Math.max(a, Math.min(b, v)); state[id] = v; state.page = 0; }
+["orows","ocols"].forEach(id => {
+  $(id).addEventListener("input", e => { const v = parseInt(e.target.value); if (!v || v < LIM[id][0] || v > LIM[id][1]) return; setDim(id, v); update({fromInput:true}); });
+  $(id).addEventListener("blur", e => { setDim(id, parseInt(e.target.value) || state[id]); update(); });
+});
+document.querySelectorAll(".sbtn").forEach(b => b.onclick = () => { const [id, d] = b.dataset.d.split(":"); setDim(id, state[id] + Number(d)); update(); });
+["ofill","okana2"].forEach(id => $(id).onchange = e => { state[id] = e.target.checked; state.page = 0; update(); });
+$("wBulkBtn").onclick = () => {
+  const box = $("wBulk"), open = box.hidden; box.hidden = !open; $("wBulkBtn").setAttribute("aria-expanded", String(open));
+  if (open){ $("wBulkText").value = state.otext; $("wBulkText").focus(); }
+};
+function bulkRows(){
+  const save = state.otext; state.otext = $("wBulkText").value; const add = rowsFromText(); state.otext = save;
+  add.forEach(a => { if (!a.y && READ_DICT[a.w]){ a.y = READ_DICT[a.w]; a.auto = true; } });
+  return add.filter(a => a.w);
+}
+$("wBulkReplace").onclick = () => { const add = bulkRows(); wRows = add.length ? add : [{w:"", y:""}]; commitRows(); renderRows(); $("wBulk").hidden = true; $("wBulkBtn").setAttribute("aria-expanded","false"); toast(`${add.length}こ のことばを入れました`); };
+$("wBulkAppend").onclick = () => { const add = bulkRows(); wRows = wRows.filter(r => r.w.trim()).concat(add); if (!wRows.length) wRows = [{w:"", y:""}]; commitRows(); renderRows(); $("wBulk").hidden = true; $("wBulkBtn").setAttribute("aria-expanded","false"); toast(`${add.length}こ 追加しました`); };
+$("oruby").onchange = e => { state.oruby = e.target.checked; update(); };
+$("onewcol").onchange = e => { state.onewcol = e.target.checked; state.page = 0; update(); };
+$("reshuffle").onclick = () => { shuffleSeed++; state.page = 0; update(); toast("問題の順番をまぜなおしました"); };
+
+// ページ送り
+function go(d){ const n = pages().length; const p = Math.max(0, Math.min(n-1, state.page + d)); if (p !== state.page){ state.page = p; draw(); } }
+$("prev").onclick = () => go(-1);
+$("next").onclick = () => go(1);
+document.addEventListener("keydown", e => {
+  if ($("sheet").open || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.key === "ArrowLeft") go(1);      // 縦書きなので左が次
+  if (e.key === "ArrowRight") go(-1);
+});
+(function swipe(){
+  const el = $("paper"); let x0 = null;
+  el.addEventListener("pointerdown", e => { x0 = e.clientX; });
+  el.addEventListener("pointerup", e => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (Math.abs(dx) > 40) go(dx > 0 ? 1 : -1); });
+})();
+
+// ---------- 学期シート ----------
+let brush = "1", painting = false, paintMode = null, termTimer = null, work = [[],[],[]];
+function loadWork(){ work = terms(state.grade).lists.map(l => l.slice()); }
+function termOfWork(c){ for (let i=0;i<3;i++) if (work[i].includes(c)) return i+1; return 0; }
+function setTerm(c, term){ for (let i=0;i<3;i++){ const k = work[i].indexOf(c); if (k>=0) work[i].splice(k,1); } if (term) work[term-1].push(c); }
+function renderBrushes(){
+  document.querySelectorAll("#brushes .brush").forEach(b => b.setAttribute("aria-checked", String(b.dataset.b===brush)));
+  work.forEach((l,i)=>{ $("c"+(i+1)).textContent = l.length ? `${l.length}字` : "まだ0字"; });
+  const left = [...KANJI[state.grade]].filter(c=>!termOfWork(c)).length;
+  $("leftCount").textContent = left ? `のこり ${left}字` : "すべて設定ずみ";
+  const fr = $("fillRest");
+  fr.hidden = !left || brush === "0";
+  fr.textContent = `のこり${left}字を${tName(brush)}に`;
+}
+document.querySelectorAll("#brushes .brush").forEach(b => b.onclick = () => { brush = b.dataset.b; renderBrushes(); });
+function termsOfWork(c){ const r = []; for (let i=0;i<3;i++) if (work[i].includes(c)) r.push(i+1); return r; }
+function updateCell(btn){
+  const c = btn.dataset.k, tm = termOfWork(c), all = termsOfWork(c);
+  btn.className = tm ? "t"+tm : "";
+  btn.querySelector("b").textContent = all.join("・");
+  btn.setAttribute("aria-label", c + (tm ? `、${tName(tm)}` : "、未設定"));
+}
+function renderGrid(){
+  const grid = $("tgrid");
+  if (grid.dataset.g !== String(state.grade)){
+    grid.dataset.g = String(state.grade); grid.innerHTML = "";
+    for (const c of KANJI[state.grade]){ const b = document.createElement("button"); b.type = "button"; b.dataset.k = c; b.innerHTML = `<b></b>${c}`; grid.appendChild(b); }
+  }
+  grid.querySelectorAll("button").forEach(updateCell);
+}
+// ---- ドラッグで並べかえ（マウス・指どちらも） ----
+function makeSortable(opts){
+  // opts: {root, item, handle?, containers: () => [el], axis: "x"|"y", onDrop()}
+  let drag = null;
+  opts.root.addEventListener("pointerdown", e => {
+    const h = opts.handle ? e.target.closest(opts.handle) : e.target.closest(opts.item);
+    if (!h || e.button > 0) return;
+    const it = h.closest(opts.item); if (!it) return;
+    drag = {it, x0: e.clientX, y0: e.clientY, on: false, id: e.pointerId};
+  });
+  window.addEventListener("pointermove", e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.on){
+      if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 5) return;
+      drag.on = true; drag.it.classList.add("dragging");
+      drag.ghost = drag.it.cloneNode(true); drag.ghost.classList.remove("dragging"); drag.ghost.classList.add("dragghost");
+      drag.ghost.style.width = drag.it.offsetWidth + "px"; document.body.appendChild(drag.ghost);
+      try { drag.it.setPointerCapture && drag.it.releasePointerCapture && drag.it.releasePointerCapture(e.pointerId); } catch(_){}
+    }
+    e.preventDefault();
+    drag.ghost.style.left = e.clientX + "px"; drag.ghost.style.top = e.clientY + "px";
+    const el = document.elementFromPoint(e.clientX, e.clientY); if (!el) return;
+    const over = el.closest(opts.item), cont = opts.containers().find(c => c.contains(el));
+    if (over && over !== drag.it && cont){
+      const r = over.getBoundingClientRect();
+      const after = opts.axis === "y" ? e.clientY > r.top + r.height/2 : e.clientX > r.left + r.width/2;
+      over.parentNode.insertBefore(drag.it, after ? over.nextSibling : over);
+    } else if (cont && !over && !cont.contains(drag.it)){
+      cont.appendChild(drag.it);
+    }
+  }, {passive:false});
+  const end = () => {
+    if (!drag) return;
+    const was = drag.on; drag.it.classList.remove("dragging"); if (drag.ghost) drag.ghost.remove(); drag = null;
+    if (was) opts.onDrop();
+  };
+  window.addEventListener("pointerup", end); window.addEventListener("pointercancel", end);
+}
+function renderOrder(){
+  const box = $("orderLists"); if (!box) return;
+  const any = work.some(l => l.length);
+  $("orderBox").hidden = !any;
+  box.innerHTML = "";
+  termIds().forEach(t => {
+    const row = document.createElement("div"); row.className = "orow";
+    row.innerHTML = `<span class="on"><i style="background:var(--t${t}d)"></i>${tName(t)}</span><div class="chips kan" data-term="${t}" role="list" aria-label="${tName(t)}の順番"></div>`;
+    const list = row.querySelector(".chips");
+    work[t-1].forEach((c, i) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "chip t" + t; b.textContent = c; b.dataset.k = c;
+      b.setAttribute("role","listitem"); b.setAttribute("aria-label", `${tName(t)}の${i+1}番目、${c}。← →で動かす`);
+      b.addEventListener("keydown", ev => {
+        if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
+        ev.preventDefault();
+        const arr = work[t-1], k = arr.indexOf(c), to = k + (ev.key === "ArrowRight" ? 1 : -1);
+        if (to < 0 || to >= arr.length) return;
+        [arr[k], arr[to]] = [arr[to], arr[k]]; commit();
+        setTimeout(() => { const nb = $("orderLists").querySelector(`.chips[data-term="${t}"] .chip:nth-child(${to+1})`); if (nb) nb.focus(); }, 0);
+      });
+      list.appendChild(b);
+    });
+    list.classList.toggle("empty", !work[t-1].length);
+    box.appendChild(row);
+  });
+}
+makeSortable({
+  root: document.getElementById("orderLists"), item: ".chip", axis: "x",
+  containers: () => [...document.querySelectorAll("#orderLists .chips")],
+  onDrop: () => {
+    const nw = [[],[],[]];
+    document.querySelectorAll("#orderLists .chips").forEach(ch => { const t = Number(ch.dataset.term); ch.querySelectorAll(".chip").forEach(b => { if (!nw[t-1].includes(b.dataset.k)) nw[t-1].push(b.dataset.k); }); });
+    work = nw;
+    if (!$("typePanel").hidden){ $("typePanel").hidden = true; $("typeBtn").setAttribute("aria-expanded","false"); }
+    commit();
+  }
+});
+makeSortable({
+  root: document.getElementById("wlist"), item: ".wrow", handle: ".handle", axis: "y",
+  containers: () => [document.getElementById("wlist")],
+  onDrop: () => {
+    const order = [...document.querySelectorAll("#wlist .wrow")].map(r => Number(r.dataset.i));
+    wRows = order.map(i => wRows[i]); commitRows(); renderRows();
+  }
+});
+function commit(){
+  renderGrid(); renderBrushes(); renderOrder();
+  clearTimeout(termTimer);
+  termTimer = setTimeout(() => { saveTerms(state.grade, work.map(l=>l.join(""))); state.page = 0; update({keepWork:true}); }, 300);
+}
+function applyAt(btn){
+  if (!btn || !btn.dataset || !btn.dataset.k) return;
+  const c = btn.dataset.k, cur = termOfWork(c);
+  if (paintMode === null) paintMode = (brush === "0" || cur === Number(brush)) ? 0 : Number(brush);
+  if (cur === paintMode) return;
+  setTerm(c, paintMode); updateCell(btn);
+}
+const gridEl = $("tgrid");
+gridEl.addEventListener("pointerdown", e => { const b = e.target.closest("button"); if (!b) return; e.preventDefault();
+  if (!$("typePanel").hidden){ $("typePanel").hidden = true; $("typeBtn").setAttribute("aria-expanded","false"); } painting = true; paintMode = null; applyAt(b); });
+gridEl.addEventListener("pointermove", e => { if (!painting) return; const el = document.elementFromPoint(e.clientX, e.clientY); applyAt(el && el.closest ? el.closest("#tgrid button") : null); });
+function endPaint(){ if (painting){ painting = false; paintMode = null; commit(); } }
+window.addEventListener("pointerup", endPaint);
+window.addEventListener("pointercancel", endPaint);
+gridEl.addEventListener("keydown", e => {
+  const b = e.target.closest && e.target.closest("button");
+  if (b && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); paintMode = null; applyAt(b); paintMode = null; commit(); }
+});
+// ---- まとめて入れる（文字入力） ----
+function addToTerm(text){
+  const term = Number(brush), g = state.grade;
+  if (!term){ toast("先に入れる学期をえらんでください"); return {ok:0, skip:0}; }
+  let ok = 0, skip = 0; const seen = new Set();
+  for (const c of String(text)){
+    if (!isKanji(c) || seen.has(c)) continue; seen.add(c);
+    if (GRADE_OF[c] !== g){ skip++; continue; }
+    setTerm(c, term); ok++;
+  }
+  commit();
+  return {ok, skip};
+}
+function brushLabel(){ return brush === "0" ? "" : tName(brush); }
+function refreshInLabels(){}
+// 文字で入力：1〜3学期の欄に、漢字・熟語・ことばを入れる
+function termKanjiFrom(text){
+  const seen = new Set(), ok = [], out = [];
+  for (const c of String(text)){
+    if (!isKanji(c) || seen.has(c)) continue; seen.add(c);
+    if (GRADE_OF[c] === state.grade) ok.push(c); else out.push(c);   // その学年の字だけ入れる
+  }
+  return {ok, out};
+}
+let typeTimer = null;
+function previewTyped(){
+  const g = state.grade, mineAll = new Set(), other = new Set(), dup = new Set(); const firstTerm = {};
+  termIds().forEach(t => {
+    const r = termKanjiFrom($("tt"+t).value);
+    $("tc"+t).textContent = r.ok.length ? `${r.ok.length}字` : "";
+    $("tp"+t).textContent = r.ok.length ? "→ " + r.ok.join("") : "";
+    r.ok.forEach(c => { mineAll.add(c); if (firstTerm[c] && firstTerm[c] !== t) dup.add(c); else firstTerm[c] = t; });
+    r.out.forEach(c => other.add(c));
+  });
+  const leftN = [...KANJI[g]].filter(c => !mineAll.has(c)).length;
+  const bits = [];
+  if (mineAll.size) bits.push(`${g}年生の字 ${mineAll.size}字を入れました（のこり${leftN}字）`);
+  if (dup.size) bits.push(`2つの${state.tsys === "2" ? "期" : "学期"}に入っている字：${[...dup].join("")}`);
+  $("typeCount").textContent = bits.join("・");
+  const box = $("typeWarn"); box.innerHTML = "";
+  if (other.size){
+    box.append(document.createTextNode(`${g}年生の字ではないので入りません：${[...other].join("")}`));
+    if (!mineAll.size){
+      const cnt = {}; other.forEach(c => { if (GRADE_OF[c]) cnt[GRADE_OF[c]] = (cnt[GRADE_OF[c]]||0) + 1; });
+      const big = Object.entries(cnt).sort((a,b) => b[1]-a[1])[0];
+      if (big){
+        const b = document.createElement("button"); b.type = "button"; b.className = "btn"; b.style.marginLeft = "8px"; b.textContent = `${big[0]}年生に切りかえる`;
+        b.onclick = () => switchGradeKeepText(Number(big[0])); box.append(b);
+      }
+    }
+  }
+}
+function applyTyped(){
+  work = [1,2,3].map(t => termIds().includes(t) ? termKanjiFrom($("tt"+t).value).ok : []);
+  renderGrid(); renderBrushes(); renderOrder();
+  clearTimeout(termTimer);
+  termTimer = setTimeout(() => { saveTerms(state.grade, work.map(l=>l.join(""))); state.page = 0; update({keepWork:true}); }, 300);
+}
+function switchGradeKeepText(g){
+  const texts = [1,2,3].map(t => $("tt"+t).value);
+  saveTerms(state.grade, work.map(l=>l.join("")));
+  state.grade = g; state.page = 0;
+  loadWork(); $("sheetTitle").textContent = `${g}年生　学期の漢字を設定`;
+  renderGrid(); renderBrushes();
+  texts.forEach((v,i) => { $("tt"+(i+1)).value = v; });
+  previewTyped(); applyTyped(); update({keepWork:true});
+  toast(`${g}年生に切りかえました`);
+}
+$("typeBtn").onclick = () => {
+  const p = $("typePanel"), open = p.hidden; p.hidden = !open; $("typeBtn").setAttribute("aria-expanded", String(open));
+  if (open){ [1,2,3].forEach(t => { $("tt"+t).value = work[t-1].join(""); }); termLabels(); previewTyped(); $("tt1").focus(); }
+};
+[1,2,3].forEach(t => $("tt"+t).addEventListener("input", () => {
+  previewTyped();
+  clearTimeout(typeTimer); typeTimer = setTimeout(applyTyped, 250);   // 打つとすぐ反映
+}));
+$("fillRest").onclick = () => { if (brush === "0") return; for (const c of KANJI[state.grade]) if (!termOfWork(c)) work[Number(brush)-1].push(c); commit(); };
+$("termReset").onclick = () => {
+  if (!confirm(`${state.grade}年生の学期の設定をすべて消しますか？`)) return;
+  work = [[],[],[]]; commit(); toast("設定を消しました");
+};
+function termLabels(){
+  const two = state.tsys === "2";
+  const names = two ? ["前期（4〜9月）","後期（10〜3月）",""] : ["1学期（4〜7月）","2学期（9〜12月）","3学期（1〜3月）"];
+  [1,2,3].forEach(t => {
+    $("tn"+t).textContent = names[t-1];
+    $("tt"+t).closest(".tterm").hidden = two && t === 3;
+    const br = document.querySelector(`#brushes .brush[data-b="${t}"]`); br.hidden = two && t === 3;
+    $("bn"+t).textContent = two ? (t===1?"前期":t===2?"後期":"") : `${t}学期`;
+  });
+  if (two && brush === "3") brush = "1";
+}
+function openSheet(b){
+  loadWork(); if (b) brush = b; termLabels();
+  $("sheetTitle").textContent = `${state.grade}年生　${state.tsys === "2" ? "前期・後期" : "学期"}の漢字を設定`;
+  renderGrid(); renderBrushes(); renderOrder();
+  $("typePanel").hidden = true; $("typeBtn").setAttribute("aria-expanded","false"); refreshInLabels();
+  const d = $("sheet"); if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open","");
+}
+function closeSheet(){
+  clearTimeout(termTimer);
+  saveTerms(state.grade, work.map(l=>l.join("")));
+  const d = $("sheet"); if (d.open){ if (d.close) d.close(); else d.removeAttribute("open"); }
+  update(); 
+  if (state.term !== "0" && pool().length) toast(`${TERM_NAME[state.term]}は${pool().length}字です`);
+}
+$("openTerms").onclick = () => openSheet(state.term !== "0" ? state.term : null);
+$("closeSheet").onclick = closeSheet;
+$("doneSheet").onclick = closeSheet;
+$("sheet").addEventListener("cancel", e => { e.preventDefault(); closeSheet(); });
+
+// ---------- 画面の更新 ----------
+function setChecked(sel, test){ document.querySelectorAll(sel).forEach(b => b.setAttribute("aria-checked", String(test(b)))); }
+let fontsOnce = {};
+async function update(opt){
+  opt = opt || {};
+  savePrefs();
+  setChecked("#grades button", b => Number(b.dataset.g) === state.grade);
+  if (state.tsys === "2" && state.term === "3") state.term = "0";
+  setChecked("#terms .term", b => b.dataset.v === state.term);
+  document.querySelectorAll("[data-key]").forEach(g => g.querySelectorAll("[data-v]").forEach(b => b.setAttribute("aria-checked", String(state[g.dataset.key] === b.dataset.v))));
+  $("trace").checked = state.trace; $("cross").checked = state.cross; $("pword").checked = state.pword;
+  const isOte = state.mode === "otehon", isCus = isCustom();
+  document.querySelector('[aria-labelledby="h-grade"]').hidden = isOte || isCus;
+  document.querySelector('[aria-labelledby="h-term"]').hidden = isOte || isCus;
+  $("otehonCard").hidden = !isOte;
+  $("customCard").hidden = !isCus;
+  $("srcRow").hidden = state.mode !== "test";
+  document.querySelector("#h-mode .n").textContent = (isOte || isCus) ? (isCus ? "2" : "1") : "3";
+  if (isCus){ const P = document.querySelector(".panel"); if (P.firstElementChild !== $("customCard")) P.insertBefore($("customCard"), P.firstElementChild); }
+  if (!opt.fromInput){ $("ctext").value = state.ctext; $("ctitle").value = state.ctitle; }
+  $("optLimit").hidden = isOte; $("optOrder").hidden = isOte;
+  if (!opt.fromInput){
+    $("otitle").value = state.otitle;
+    $("orows").value = state.orows; $("ocols").value = state.ocols;
+  }
+  $("oTotal").textContent = state.orows * state.ocols;
+  $("oruby").checked = state.oruby; $("onewcol").checked = state.onewcol;
+  $("ofill").checked = state.ofill; $("okana2").checked = state.okana2;
+
+
+  const T = terms(state.grade), all = KANJI[state.grade].length;
+  $("gradeAside").textContent = `${state.grade}年生で習う漢字は${all}字`;
+  document.querySelectorAll("#terms .term").forEach(b => {
+    const v = b.dataset.v, st = b.querySelector(".st");
+    if (v === "0"){ st.textContent = `${all}字`; st.className = "st ok"; }
+    else { const n = T.lists[Number(v)-1].length; st.textContent = n ? `${n}字` : "未設定"; st.className = n ? "st ok" : "st"; }
+  });
+  const setSet = new Set(); T.lists.forEach(l => l.forEach(c => { if (GRADE_OF[c] === state.grade) setSet.add(c); }));
+  const set = setSet.size;
+  const tot = T.lists.reduce((a,l)=>a+l.length,0) || 1;
+  ["p1","p2","p3"].forEach((c,i)=>{ document.querySelector("#prog ."+c).style.width = (T.lists[i].length/Math.max(all, tot)*100)+"%"; });
+  $("prog").title = `${set} / ${all}字 設定ずみ`;
+  $("openTermsLabel").textContent = (state.tsys === "2" ? "前期・後期" : "学期") + (set ? "の漢字を変更" : "の漢字を設定");
+  $("termHint").textContent = set === 0
+    ? "学期ごと（前期・後期ごと）のテストには、その期間に習う漢字を設定します（熟語のまま貼り付けるか、タップ）。"
+    : set < all ? `${set} / ${all}字を設定ずみ。のこり${all-set}字はまだどの${state.tsys === "2" ? "期" : "学期"}にも入っていません。` : "すべての字の設定がすんでいます。";
+
+  $("orderList").textContent = (T.custom || isCus) ? "入力した順" : "配当表の順";
+  const isTest = state.mode === "test";
+  $("optTest").hidden = !isTest;
+  $("optPractice").hidden = state.mode !== "practice";
+  $("reshuffleRow").hidden = state.order !== "shuffle";
+  const moreBits = isOte ? [] : isTest ? [`${state.qn}問`, {all:"ことばの漢字ぜんぶ",target:"その字だけ"}[state.write], {each:"こたえ1まいごと",end:"こたえさいご",none:"こたえなし"}[state.ans]] :
+                  state.mode === "practice" ? [`マス${{L:"大",M:"中",S:"小"}[state.size]}`] : [];
+  if (state.mode === "practice" && state.pword) moreBits.push("ことばつき");
+  if (state.limit !== "all") moreBits.push(`${state.limit}字だけ`);
+  if (!isOte) moreBits.push(state.order === "shuffle" ? "バラバラ" : $("orderList").textContent);
+  moreBits.push(state.cross ? "十字の点線あり" : "点線なし");
+  $("moreSum").textContent = "（" + moreBits.join("・") + "）";
+
+  // 下のバー
+  const full = state.term === "0" ? KANJI[state.grade].length : T.lists[Number(state.term)-1].length;
+  const n = pool().length, per = perPage(), sheets = Math.max(1, Math.ceil(n/per)), pg = pages().length;
+  const kind = {test:"漢字テスト", practice:"練習プリント", check:"かくにん表", otehon:"お手本"}[state.mode];
+  $("sumMain").textContent = `${state.grade}年生・${TERM_NAME[state.term]}の${kind}`;
+  const nTxt = n < full ? `${full}字から${n}字` : `${n}字`;
+  $("sumSub").textContent = n ? (isTest && state.ans !== "none" ? `${nTxt} → ${sheets}まい＋こたえ（${pg}ページ）` : `${nTxt} → ${pg}ページ`) : "この期間の漢字がまだ設定されていません";
+  if (isOte){
+    const F = otehonFlow();
+    $("sumMain").textContent = `お手本「${state.otitle || "お手本"}」`;
+    $("sumSub").textContent = F.words ? `${F.words}語${F.repeats ? `（＋くり返し${F.repeats}語）` : ""}・${F.L.R}×${F.L.C}＝${F.L.per}マス → ${F.total}ページ` : "お手本にする字を入力してください";
+  }
+  if (isCus){
+    const cn = parseCustom().length;
+    $("sumMain").textContent = `漢字テスト「${state.ctitle || "漢字テスト"}」（自分で入力）`;
+    $("sumSub").textContent = cn ? `${n}問 → ${sheets}まい${state.ans !== "none" ? `＋こたえ（${pg}ページ）` : ""}` : "テストに出すことばを入力してください";
+    $("cusCount").textContent = cn ? `${cn}問 入っています` : "";
+    $("optLimit").querySelector(".lab").textContent = "出題する数";
+  }
+  $("make").disabled = false;
+
+  if (state.page >= pg) state.page = pg - 1;
+  draw();
+  const key = isCus ? "c:" + state.ctext + state.ctitle : state.grade;
+  if (!fontsOnce[key]){ await fontsReady(); fontsOnce[key] = true; draw(); }
+}
+function draw(){
+  const list = pages(), pg = list[state.page];
+  renderTo($("preview"), pg, 4);
+  $("paper").classList.toggle("portrait", !!pg.otehon);
+  $("paper").querySelector("canvas").setAttribute("aria-label", pg.otehon ? "お手本（A4たて）のプレビュー" : "プリントのプレビュー");
+  $("pageLabel").textContent = `${state.page+1} / ${list.length}`;
+  $("prev").disabled = state.page === 0; $("next").disabled = state.page >= list.length-1;
+  const k = $("pageKind");
+  if (state.mode === "test" && pg.answer){ k.textContent = `こたえ ${pg.idx+1}`; k.className = "tag ans"; }
+  else { k.textContent = state.mode === "test" ? `問題 ${pg.idx+1}` : `${pg.idx+1}まいめ`; k.className = "tag"; }
+  const dots = $("dots");
+  if (dots.childElementCount !== list.length || dots.dataset.sig !== sig()){
+    dots.dataset.sig = sig(); dots.innerHTML = "";
+    if (list.length > 1 && list.length <= 60) list.forEach((p,i) => {
+      const b = document.createElement("button"); b.type = "button";
+      if (p.answer) b.className = "a";
+      b.setAttribute("aria-label", `${i+1}ページ目${p.answer?"（こたえ）":""}`);
+      b.onclick = () => { state.page = i; draw(); };
+      dots.appendChild(b);
+    });
+  }
+  [...dots.children].forEach((b,i)=>b.setAttribute("aria-current", String(i===state.page)));
+}
+function sig(){ return [state.tsrc, isCustom() ? state.ctext : "", state.grade,state.term,state.mode,state.qn,state.ans,state.size,state.order,shuffleSeed,state.mode==="otehon"?pages().length:0].join("|"); }
+
+// ---------- 出力 ----------
+async function buildCanvases(pxPerMm, onEach){
+  await fontsReady();
+  const list = pages(), out = [];
+  for (let p=0;p<list.length;p++){
+    const cv = document.createElement("canvas");
+    renderTo(cv, list[p], pxPerMm); out.push(cv);
+    if (onEach) onEach(p+1, list.length);
+    await new Promise(r=>setTimeout(r,0));
+  }
+  return out;
+}
+function filename(){
+  if (isCustom()) return `漢字テスト_${(state.ctitle || "自分で入力").replace(/[\\/:*?"<>|\s]/g,"")}.pdf`;
+  if (state.mode === "otehon") return `お手本_${(state.otitle || "お手本").replace(/[\\/:*?"<>|\s]/g,"")}.pdf`;
+  const kind = state.mode==="test" ? "漢字テスト" : state.mode==="check" ? "漢字かくにん表" : "漢字練習";
+  return `${state.grade}年_${TERM_NAME[state.term]}_${kind}.pdf`;
+}
+function needTerms(){
+  if (isCustom()){ if (pool().length) return false; toast("テストに出すことばを入力してください"); $("ctext").focus(); return true; }
+  if (state.mode === "otehon"){ if (parseOtehon().length) return false; toast("お手本にすることばを入力してください"); renderRows({i:0, f:"w"}); return true; }
+  if (pool().length) return false;
+  toast("この期間の漢字がまだ設定されていません");
+  openSheet(state.term); return true;
+}
+$("make").onclick = async () => {
+  if (needTerms()) return;
+  if (!window.jspdf){ toast("PDFの部品を読みこめませんでした。ページを開きなおしてください。"); return; }
+  const btn = $("make"), lab = $("makeLabel"), fill = $("makeFill");
+  btn.disabled = true;
+  try {
+    const cvs = await buildCanvases(8, (i,t)=>{ lab.textContent = `つくっています ${i}/${t}`; fill.style.width = (i/t*100)+"%"; });
+    lab.textContent = "まとめています…";
+    const list = pages();
+    const orient = i => { const z = pageSize(list[i]); return z.ph > z.pw ? "portrait" : "landscape"; };
+    const pdf = new jspdf.jsPDF({orientation:orient(0), unit:"mm", format:"a4", compress:true});
+    cvs.forEach((cv,i)=>{ const z = pageSize(list[i]); if (i) pdf.addPage("a4", orient(i)); pdf.addImage(cv.toDataURL("image/png"), "PNG", 0, 0, z.pw, z.ph, undefined, "FAST"); });
+    const blob = pdf.output("blob");
+    if (downloads){
+      try { await downloads.save({filename: filename(), data: blob}); toast("PDFを保存しました"); }
+      catch(e){ toast(e && e.code==="declined" ? "保存を取りやめました" : "保存できませんでした。印刷ボタンからPDFに保存できます"); }
+    } else if (!window.claude){
+      // GitHub Pages など、ふつうのブラウザで開いたとき：そのまま保存
+      try { pdf.save(filename()); toast("PDFを保存しました"); }
+      catch(e){ toast("保存できませんでした。印刷ボタンから「PDFに保存」をえらんでください"); }
+    } else {
+      toast("この画面ではファイル保存が使えません。印刷ボタンから「PDFに保存」をえらんでください");
+    }
+  } catch(e){ toast("PDFをつくれませんでした：" + (e.message||e)); }
+  btn.disabled = false; lab.textContent = "PDFをつくる"; fill.style.width = "0";
+};
+$("print").onclick = async () => {
+  if (needTerms()) return;
+  toast("印刷の準備をしています…");
+  const cvs = await buildCanvases(6);
+  const area = $("printArea"); area.innerHTML = "";
+  const portrait = state.mode === "otehon";
+  let ps = document.getElementById("pageStyle");
+  if (!ps){ ps = document.createElement("style"); ps.id = "pageStyle"; document.head.appendChild(ps); }
+  ps.textContent = portrait ? "@media print{@page{size:A4 portrait;margin:0}#printArea img{width:210mm!important;height:297mm!important}}" : "@media print{@page{size:A4 landscape;margin:0}}";
+  cvs.forEach(cv => { const img = new Image(); img.src = cv.toDataURL("image/png"); area.appendChild(img); });
+  await new Promise(r=>setTimeout(r,300));
+  try { window.print(); } catch(e){ toast("この画面では印刷が使えません。「PDFをつくる」をお使いください"); }
+};
+
+buildGrades();
+buildTerms();
+renderRows();
+update();
+
+</script>
+</body>
+</html>
